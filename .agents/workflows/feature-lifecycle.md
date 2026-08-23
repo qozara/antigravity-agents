@@ -1,6 +1,6 @@
 # Feature Lifecycle Workflow: End-to-End Agentic SDLC
 
-This workflow defines the chained execution lifecycle for developing features in Antigravity using specialized subagents: **UX Designer**, **Business Analyst**, **Software Architect**, **QA/Test Engineer**, and **Software Engineer**.
+This workflow defines the chained execution lifecycle for developing features in **Google Antigravity IDE** using specialized subagents: **UX Designer**, **Business Analyst**, **Software Architect**, **QA/Test Engineer**, and **Software Engineer**.
 
 ---
 
@@ -8,16 +8,16 @@ This workflow defines the chained execution lifecycle for developing features in
 
 ```mermaid
 flowchart TD
-    A[Feature Idea / Raw Intent] --> B[1. UX Designer: Aura]
-    B -->|Wireframes, UX Specs, Flows| C[2. Business Analyst]
-    C -->|Epic & Gherkin User Stories| D[3. Software Architect]
-    D -->|TDD, Schema, API Contracts, Tasks| E[4. QA / SDET Engineer]
-    E -->|Gap Analysis & Unit Test Specs| F[5. Software Engineer]
+    A[Feature Idea / Raw Intent] --> B[1. UX Designer: designer]
+    B -->|Wireframes, UX Specs, Flows| C[2. Business Analyst: analyst]
+    C -->|Epic & Gherkin User Stories| D[3. Software Architect: architect]
+    D -->|TDD, Schema, API Contracts, Tasks| E[4. QA / SDET Engineer: tester]
+    E -->|Gap Analysis & Unit Test Specs Table| F[5. Software Engineer: engineer]
     E -->|Automated E2E / Integration Specs| G[Test Suite Repository]
-    F -->|Unified Git Patch & Unit Tests| H[Patch Application & Build]
-    H --> I[6. QA & Regression Verification]
+    F -->|Direct IDE File Edits & Unit Tests| H[Workspace Build & Test Runner]
+    H --> I[6. QA & Regression Verification: tester]
     I -->|Pass| J[Feature Completed & Merged]
-    I -->|Fail| F
+    I -->|Fail / Regressions| F
 ```
 
 ---
@@ -79,24 +79,33 @@ flowchart TD
 
 ---
 
-### Stage 5: TDD Implementation & Patch Generation
+### Stage 5: TDD Implementation (Antigravity IDE vs. Web Chatbot)
+
+#### A. Default: Native Execution in Antigravity IDE
 * **Agent:** `engineer` (`.agents/subagents/engineer.md`)
 * **Input:** Architect's Task Breakdown + QA's Unit Test Specifications table.
 * **Process:**
   * **System 2 Mental Sandbox:** Analyzes blast radius, edge cases, and regression risks.
-  * **Red-Green-Refactor:** Writes the unit tests matching QA specifications *before* writing business logic.
-  * Implements minimal, clean, self-descriptive code satisfying all test cases.
-  * Adheres to the *React & Engineering Best Practices* (`.agents/skills/vercel-react-best-practices.md`).
-  * Emits code strictly via the **PatchPilot Unified Diff Protocol**.
+  * **Red-Green-Refactor Cycle:**
+    1. **Red:** Writes/updates unit tests directly in the workspace test files matching QA specifications.
+    2. **Green:** Implements minimal, clean, self-descriptive business logic to pass all tests.
+    3. **Refactor:** Optimizes and cleans code, enforcing `.agents/skills/vercel-react-best-practices.md`.
+  * Executes direct surgical file edits inside Antigravity (no PatchPilot formatting overhead).
 * **Output Artifacts:**
-  * Single atomic Git Unified Diff patch.
-  * Updates to `IMPLEMENTATION_PLAN.md` checklist.
+  * Implemented source and unit test files directly in workspace.
+  * Incremental updates to `IMPLEMENTATION_PLAN.md` checklist.
+
+#### B. Alternative: Hybrid Web Chatbot Workflow
+* **Agent:** `engineer-webchatbot` (`.agents/subagents/engineer-webchatbot.md`)
+* **Usage:** Used *only* when running sessions via external web chatbots (Gemini / Claude Web) where the user manually executes patches.
+* **Format:** Outputs single atomic Git Unified Diffs (`PatchPilot` protocol).
 
 ---
 
-### Stage 6: Automated Verification & Review
-* **Agent:** `tester` + Local Test Runner
+### Stage 6: Automated Verification & Regression Review
+* **Agent:** `tester` + Antigravity Test Runner
 * **Process:**
-  * Applies diff patch and executes unit, integration, and regression suites.
-  * Validates that all blast-radius components remain functional.
-  * If tests fail or regressions occur, the loop returns to Stage 5 with specific failure traces.
+  * Runs the full test suite (unit, integration, regression) within the IDE.
+  * Validates that all blast-radius components and edge cases remain fully functional.
+  * If tests fail or regressions occur, returns to Stage 5 with specific failure logs for remediation.
+  * Once all checks pass, marks feature implementation complete in `IMPLEMENTATION_PLAN.md`.
