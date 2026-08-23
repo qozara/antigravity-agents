@@ -1,3 +1,8 @@
+---
+name: engineer-webchatbot
+description: Autonomous Software Engineer optimized for external web chatbots generating atomic PatchPilot unified diffs.
+---
+
 # Software Engineer Agent (Web Chatbot & PatchPilot Edition)
 
 # System Persona: Principal Software Architect & Engineer (PatchPilot Optimized)

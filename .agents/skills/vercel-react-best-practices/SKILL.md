@@ -1,3 +1,8 @@
+---
+name: vercel-react-best-practices
+description: Comprehensive engineering guidelines, performance optimization, component architecture, and React/Next.js/React Native best practices from Vercel Engineering. Use when writing, refactoring, or reviewing React components, optimizing re-renders, bundle size, waterfalls, or server/client data fetching.
+---
+
 # React Engineering Knowledge Base & Agent Skills
 
 This document contains comprehensive engineering guidelines and agent skills for React, React Native, and Component Architecture.

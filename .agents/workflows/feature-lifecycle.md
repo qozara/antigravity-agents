@@ -1,3 +1,8 @@
+---
+name: feature-lifecycle
+description: End-to-end chained SDLC workflow coordinating UX Designer, Business Analyst, Software Architect, QA SDET, and Software Engineer across discovery, architecture, test specs, and TDD implementation.
+---
+
 # Feature Lifecycle Workflow: End-to-End Agentic SDLC
 
 This workflow defines the chained execution lifecycle for developing features in **Google Antigravity IDE** using specialized subagents: **UX Designer**, **Business Analyst**, **Software Architect**, **QA/Test Engineer**, and **Software Engineer**.
@@ -25,7 +30,7 @@ flowchart TD
 ## Step-by-Step Chained Protocol
 
 ### Stage 1: UX/UI Discovery & Information Architecture
-* **Agent:** `designer` (`.agents/subagents/designer.md`)
+* **Agent:** `designer` (`.agents/agents/designer.md`)
 * **Input:** High-level feature concept or raw user requirement.
 * **Process:** 
   * Inquires regarding user personas and primary problem statements.
@@ -38,7 +43,7 @@ flowchart TD
 ---
 
 ### Stage 2: Formal Requirements & Business Analysis
-* **Agent:** `analyst` (`.agents/subagents/analyst.md`)
+* **Agent:** `analyst` (`.agents/agents/analyst.md`)
 * **Input:** Designer's wireframes + User's business objectives.
 * **Process:**
   * Validates scope boundaries (In-Scope vs. Out-of-Scope).
@@ -51,7 +56,7 @@ flowchart TD
 ---
 
 ### Stage 3: Technical Blueprint & System Architecture
-* **Agent:** `architect` (`.agents/subagents/architect.md`)
+* **Agent:** `architect` (`.agents/agents/architect.md`)
 * **Input:** Epic and User Stories from the Business Analyst.
 * **Process:**
   * Evaluates architectural feasibility, security trade-offs (OWASP), and data consistency.
@@ -67,7 +72,7 @@ flowchart TD
 ---
 
 ### Stage 4: "Shift-Left" QA & Test Specification
-* **Agent:** `tester` (`.agents/subagents/tester.md`)
+* **Agent:** `tester` (`.agents/agents/tester.md`)
 * **Input:** Architecture Blueprint, `IMPLEMENTATION_PLAN.md`, and User Stories.
 * **Process:**
   * **Destructive Gap Analysis:** Identifies logic flaws, missing error handlers, edge cases, and security vulnerabilities.
@@ -82,21 +87,21 @@ flowchart TD
 ### Stage 5: TDD Implementation (Antigravity IDE vs. Web Chatbot)
 
 #### A. Default: Native Execution in Antigravity IDE
-* **Agent:** `engineer` (`.agents/subagents/engineer.md`)
+* **Agent:** `engineer` (`.agents/agents/engineer.md`)
 * **Input:** Architect's Task Breakdown + QA's Unit Test Specifications table.
 * **Process:**
   * **System 2 Mental Sandbox:** Analyzes blast radius, edge cases, and regression risks.
   * **Red-Green-Refactor Cycle:**
     1. **Red:** Writes/updates unit tests directly in the workspace test files matching QA specifications.
     2. **Green:** Implements minimal, clean, self-descriptive business logic to pass all tests.
-    3. **Refactor:** Optimizes and cleans code, enforcing `.agents/skills/vercel-react-best-practices.md`.
+    3. **Refactor:** Optimizes and cleans code, enforcing `.agents/skills/vercel-react-best-practices/SKILL.md`.
   * Executes direct surgical file edits inside Antigravity (no PatchPilot formatting overhead).
 * **Output Artifacts:**
   * Implemented source and unit test files directly in workspace.
   * Incremental updates to `IMPLEMENTATION_PLAN.md` checklist.
 
 #### B. Alternative: Hybrid Web Chatbot Workflow
-* **Agent:** `engineer-webchatbot` (`.agents/subagents/engineer-webchatbot.md`)
+* **Agent:** `engineer-webchatbot` (`.agents/agents/engineer-webchatbot.md`)
 * **Usage:** Used *only* when running sessions via external web chatbots (Gemini / Claude Web) where the user manually executes patches.
 * **Format:** Outputs single atomic Git Unified Diffs (`PatchPilot` protocol).
 
