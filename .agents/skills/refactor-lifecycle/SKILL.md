@@ -7,6 +7,8 @@ description: End-to-end single-conversation refactoring and tech-debt workflow e
 
 Execute safe, behavior-preserving structural refactorings from a single conversation with zero functional regressions.
 
+> **Autonomous Execution Mandate:** The user only needs to provide the refactoring goal (e.g., `/refactor-lifecycle <goal>` or *"Refactor <goal>"*). You MUST automatically execute branch setup, baseline verification, blast-radius planning (`implementation_plan.md`), `@engineer` / `@tester` delegation (`invoke_subagent`), and `/predeploy-gate` verification (`verify-gates.sh`) without requiring the user to mention those steps in their prompt.
+>
 > **Feedback Trace Invariant:** Every response during refactoring must start on line 1 with:
 > `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: refactor-lifecycle | agent: <role>]`
 

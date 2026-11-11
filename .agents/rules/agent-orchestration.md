@@ -31,12 +31,19 @@ Operate as a high-leverage orchestrator in the primary conversation while minimi
 - **👥 Multi-Worker Coordination (`/swarm`):** Run `/swarm` when parallel workers need to coordinate and review changes across a shared message board with `@mentions`.
 - **🏗️ Long-Horizon Campaigns (`/teamwork`):** Use `/teamwork` for multi-day, multi-phase system migrations or repository-wide rebuilds.
 
-## 3. Single-Conversation Workflow Routing
-- Run complete SDLC loops from a single conversation using progressive-disclosure skills:
-  - `/feature-lifecycle`: End-to-end feature discovery, architecture, TDD implementation, and gate verification.
-  - `/refactor-lifecycle`: Baseline verification, blast-radius analysis, structural cleanup, and regression proof.
-  - `/bugfix-lifecycle`: Root-cause reproduction test, surgical fix, and full regression verification.
-  - `/predeploy-gate`: Deterministic terminal verification script (typecheck, test, security audit, build, and hygiene).
+## 3. Autonomous Intent Routing & Zero-Boilerplate Execution
+The user NEVER needs to manually instruct you to plan, delegate to `@tester`/`@engineer`, create a branch, or run `/predeploy-gate` in their prompt. Whether invoked via a slash command (`/feature-lifecycle`, `/refactor-lifecycle`, `/bugfix-lifecycle`) OR plain natural language, you MUST automatically classify the prompt intent and execute the full workflow:
+
+1. **Automatic Intent Classification & Skill Loading:**
+   - **New Feature / Enhancement** (e.g., `/feature-lifecycle <goal>` or *"Implement/Add X"*): Immediately load `.agents/skills/feature-lifecycle/SKILL.md` (`skill: feature-lifecycle`).
+   - **Refactoring / Tech Debt / Cleanup** (e.g., `/refactor-lifecycle <goal>` or *"Refactor/Clean up X"*): Immediately load `.agents/skills/refactor-lifecycle/SKILL.md` (`skill: refactor-lifecycle`).
+   - **Bug Fix / Regression / Error** (e.g., `/bugfix-lifecycle <goal>` or *"Fix/Debug X"*): Immediately load `.agents/skills/bugfix-lifecycle/SKILL.md` (`skill: bugfix-lifecycle`).
+   - **Verification / Gate Run** (e.g., `/predeploy-gate` or automatic Phase 3): Execute `~/.gemini/config/skills/predeploy-gate/scripts/verify-gates.sh "$(pwd)"`.
+
+2. **Autonomous Subagent & Gate Execution (No User Prompting Required):**
+   - **Planning:** Automatically create/switch to a dedicated branch and produce `implementation_plan.md` (or delegate to `@architect` via `invoke_subagent` for complex schemas/contracts) before writing code.
+   - **Delegation:** Automatically dispatch `@tester` (for breaker specs / failing reproduction tests) and `@engineer` (for Red-Green-Refactor implementation) using `invoke_subagent` whenever files need creation or modification.
+   - **Pre-Deploy Gate:** Automatically run `verify-gates.sh` (`/predeploy-gate`) and sync docs/i18n before declaring any coding task finished.
 
 ## 4. Context & Token Optimization Rules
 - **Progressive Disclosure:** Do not inline lengthy style guides or framework manuals into rules. Load specialized skills (`typescript-pro`, `vercel-react-best-practices`, `security-auditor`, `e2e-testing-patterns`) only when the task touches those domains.

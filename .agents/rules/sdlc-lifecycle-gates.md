@@ -5,7 +5,7 @@ description: "Non-negotiable verification gates, phase progression, and integrit
 
 # Mandatory SDLC Delivery Lifecycle & Quality Gates
 
-Every feature implementation, architectural refactoring, or bug fix must follow this phase progression. Do not advance to the next phase until the current phase's exit criteria are satisfied.
+Every feature implementation, architectural refactoring, or bug fix MUST autonomously follow this 4-phase progression—even when the user only provides a short goal description (with or without a `/feature-lifecycle`, `/refactor-lifecycle`, or `/bugfix-lifecycle` prefix). Never wait for the user to explicitly mention planning, branch creation, `@tester`/`@engineer` delegation, or `/predeploy-gate` in their prompt. Do not advance to the next phase until the current phase's exit criteria are satisfied.
 
 ## Phase 1: Planning, Blast Radius & Architecture
 - **Branch Hygiene:** Verify current Git branch first. Never commit or push directly to `main` or `master`; create or switch to a dedicated branch (`feature/<name>`, `refactor/<name>`, or `fix/<name>`).

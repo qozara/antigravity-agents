@@ -101,18 +101,21 @@ To remove global symlinks:
 
 ---
 
-## 💬 Single-Conversation Trigger Prompts
+## 💬 Zero-Boilerplate Trigger Prompts
 
-Because global rules (`sdlc-lifecycle-gates.md` and `agent-orchestration.md`) are `always_on` and lifecycle skills are exposed as `/` slash commands, you can trigger any full SDLC loop from a single prompt:
+Because global rules (`sdlc-lifecycle-gates.md` and `agent-orchestration.md`) are `always_on`, **you never need to manually instruct the agent to plan, create branches, delegate to `@tester`/`@engineer`, or run `/predeploy-gate` in your prompt**. The orchestrator automatically executes all phases from a concise goal description (with or without the slash command):
 
-- **New Feature:**
-  > `/feature-lifecycle Implement [feature description]. Orchestrate planning (/plan), delegate TDD specs and implementation to @tester and @engineer, run /predeploy-gate, update docs/i18n, and prepare the feature branch.`
+- **New Feature** *(automatically creates `feature/<name>`, authors `implementation_plan.md`, delegates TDD to `@tester` & `@engineer`, runs `/predeploy-gate`, and updates docs/i18n)*:
+  > `/feature-lifecycle Add CSV export for monthly transactions`
+  > *(or simply: `Implement CSV export for monthly transactions`)*
 
-- **Refactoring / Tech Debt:**
-  > `/refactor-lifecycle Refactor [module/component]. Verify baseline tests first, map blast radius in /plan, delegate atomic transformations to @engineer, and verify zero regressions with /predeploy-gate.`
+- **Refactoring / Tech Debt** *(automatically creates `refactor/<name>`, runs baseline gates, maps blast radius in `implementation_plan.md`, delegates atomic transforms to `@engineer`, and runs `/predeploy-gate`)*:
+  > `/refactor-lifecycle Extract currency formatting from UI components into domain-core`
+  > *(or simply: `Refactor currency formatting out of UI components into domain-core`)*
 
-- **Bug Fix:**
-  > `/bugfix-lifecycle Fix [issue/bug description]. Isolate root cause, write a failing reproduction test first via @tester/@engineer, apply the minimal surgical fix, and verify all checks with /predeploy-gate.`
+- **Bug Fix** *(automatically creates `fix/<name>`, isolates root cause, writes a failing reproduction test via `@tester`/`@engineer`, applies the surgical fix, and runs `/predeploy-gate`)*:
+  > `/bugfix-lifecycle Fix crash when submitting an empty filter form`
+  > *(or simply: `Fix crash when submitting an empty filter form`)*
 
 ---
 
