@@ -1,6 +1,32 @@
-# Antigravity Global SDLC Rules, Skills, Subagents & Deterministic Guards (Qozara)
+# Antigravity Global SDLC Rules, Skills, Subagents & Deterministic Guards
 
-Centralized, token-optimized configuration for **Google Antigravity** (App, IDE, and CLI). Separates **always-on system invariants (Rules)** from **progressive-disclosure execution recipes (Skills/Workflows)**, delegates isolated code churn to **Flash-tier subagents**, and enforces **deterministic quality gates** via Antigravity Lifecycle Hooks (`hooks.json`) and Git `pre-push` hooks.
+Centralized, token-optimized configuration for **Google Antigravity** (App, IDE, and CLI), fully aligned with **November 2026** frontier foundation models and agent harness best practices.
+
+It separates **always-on system invariants (Rules)** from **progressive-disclosure execution recipes (Skills/Workflows)**, delegates context-heavy code churn to **Flash-tier subagents (Gemini 3.8 Flash)** while pinning the primary orchestrator to **Frontier Reasoning models (Gemini 4 Carbon / Gemini 4 Argon)**, and enforces **deterministic quality gates** via Antigravity Lifecycle Hooks (`hooks.json`) and Git `pre-push` hooks.
+
+---
+
+## 🧠 November 2026 Model Architecture & Tiering
+
+| Tier / Role | Model Selection | Frontmatter Config | Execution Purpose |
+| :--- | :--- | :--- | :--- |
+| **Primary Orchestrator** | **Gemini 4 Carbon** (High thinking) or **Gemini 4 Argon** (Medium thinking) | Active session / `/plan` | Formulates architecture, plans, blast-radius boundaries, quality gate verifications, and PR reviews. |
+| **System Architect** (`@architect`) | **Frontier Tier** (Gemini 4 Carbon / Argon) | `model: pro` | Complex schema design (zod/RxDB/SQL), API contracts, Mermaid sequence/C4 diagrams, and ADR authoring. |
+| **TDD Engineer** (`@engineer`) | **Gemini 3.8 Flash** | `model: flash` | Single-pass TDD (Red-Green-Refactor), surgical file edits, component scaffolding, and lint/type error fixes. |
+| **QA / SDET** (`@tester`) | **Gemini 3.8 Flash** | `model: flash` | Unit test specification tables, gap analysis, failing reproduction tests, and automated integration/E2E test suites. |
+| **Business Analyst** (`@analyst`) | **Gemini 3.8 Flash** | `model: flash` | Scope boundaries, Non-Functional Requirements (NFRs), and Gherkin acceptance criteria (`Given/When/Then`). |
+| **UI/UX Designer** (`@designer`) | **Gemini 3.8 Flash** | `model: flash` | User flows (Mermaid.js), component wireframe specifications, and WCAG 2.2 accessibility verification. |
+
+### 🚀 Escalation Modes (On-Demand Multi-Agent Reasoning)
+- **`/boost` (Deep Reasoning Pipeline):** For tough engineering problems requiring iterative multi-round verification:
+  - Concurrency bugs, race conditions, deadlocks, and thread synchronization issues.
+  - Complex algorithmic optimization (SIMD, graph traversals, data structures).
+  - Deep root-cause investigation across unfamiliar, multi-module execution paths.
+  - Non-trivial multi-file refactoring with high regression risk.
+- **`/swarm` (Shared-Board Coordination):** Coordinates parallel worker agents communicating via a shared message board with `@mentions`.
+- **`/teamwork` (Long-Horizon Campaigns):** Multi-role collaborative agent teams for long-horizon multi-day campaigns.
+
+> **Model Lifecycle Note:** Claude 4.6 and GPT-OSS-120b are sunsetting in mid-November 2026. For Claude-based sessions, use Claude Opus 5.5 (Thinking) or Claude Sonnet 5.5 (Thinking).
 
 ---
 
@@ -43,20 +69,34 @@ antigravity-agents/
 │   │   ├── pre-tool-guard.sh            # Antigravity PreToolUse hook blocking main pushes & running gates
 │   │   └── git-pre-push.sh              # Git .git/hooks/pre-push deterministic gate wrapper
 │   └── hooks.json                       # Antigravity Lifecycle Hooks configuration
-├── setup-symlinks.sh                    # Global symlink & git-hook installer
+├── setup-symlinks.sh                    # Portable global symlink & git-hook installer
+├── .gitignore                           # Git ignore rules for OS, temporary, and sensitive files
 └── README.md
 ```
 
 ---
 
-## 🚀 Global Installation Across All Workspaces
+## 🚀 Replicable Setup on Any Computer
 
-Run once from terminal to link rules, skills, subagents, `hooks.json`, and Git `pre-push` hooks across your workstation:
+This setup is fully portable and uses dynamic `$HOME` resolution without hardcoded paths or personal credentials.
 
+### 1. Clone & Bootstrap
 ```bash
-cd ~/VSCodeProjects/qozara/antigravity-agents
+git clone https://github.com/qozara/antigravity-agents.git
+cd antigravity-agents
 chmod +x setup-symlinks.sh
 ./setup-symlinks.sh
+```
+
+### 2. Options & Custom Projects Directory
+By default, the script links Git pre-push hooks into all repositories located in the sibling folder. To specify a custom projects directory:
+```bash
+./setup-symlinks.sh --projects-dir ~/my-projects
+```
+
+To remove global symlinks:
+```bash
+./setup-symlinks.sh --clean-global
 ```
 
 ---
@@ -73,3 +113,12 @@ Because global rules (`sdlc-lifecycle-gates.md` and `agent-orchestration.md`) ar
 
 - **Bug Fix:**
   > `/bugfix-lifecycle Fix [issue/bug description]. Isolate root cause, write a failing reproduction test first via @tester/@engineer, apply the minimal surgical fix, and verify all checks with /predeploy-gate.`
+
+---
+
+## 🔒 Privacy & Public Distribution Invariants
+
+This repository is built for public distribution on GitHub with strict data hygiene:
+- **Zero Workstation Path Leakage:** Enforced by Gate 2 in `verify-gates.sh`. No hardcoded `/Users/...` or user-specific paths are tracked.
+- **Zero Credentials / Tokens:** No API keys, credentials, or `.env` files are included or tracked.
+- **Clean Git Tracking:** Root `.gitignore` prevents OS metadata (`.DS_Store`), backup files (`*.bak`), and test databases from being committed.

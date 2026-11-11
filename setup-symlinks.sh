@@ -2,25 +2,32 @@
 # ==============================================================================
 # setup-symlinks.sh
 #
-# Configures global Google Antigravity access (App, IDE, and CLI) for Qozara
+# Configures global Google Antigravity access (App, IDE, and CLI) for
 # rules, skills (slash-invocable workflows), custom subagents, lifecycle hooks,
 # and deterministic Git pre-push hooks across all workspaces.
+#
+# Cross-Machine Replicable: Uses standard POSIX paths and dynamic $HOME.
+# Works out-of-the-box on macOS and Linux without hardcoded user directories.
 # ==============================================================================
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="${SCRIPT_DIR}/.agents"
-PROJECTS_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# Default to sibling repositories directory (or configure via ANTIGRAVITY_PROJECTS_DIR or --projects-dir)
+PROJECTS_ROOT="${ANTIGRAVITY_PROJECTS_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 
 print_usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  --global              Symlink rules, skills, subagents, hooks & git hooks globally (Default)"
-    echo "  --install-git-hooks   Install deterministic pre-push hook into all Git repos in ${PROJECTS_ROOT}"
-    echo "  --clean-global        Remove global Antigravity symlinks"
-    echo "  -h, --help            Show this help message"
+    echo "  --global                  Symlink rules, skills, subagents, hooks & git hooks globally (Default)"
+    echo "  --projects-dir <dir>      Specify target directory containing Git repositories for pre-push hooks"
+    echo "                            (Defaults to sibling directory: ${PROJECTS_ROOT})"
+    echo "  --install-git-hooks       Install deterministic pre-push hook into Git repos in target directory"
+    echo "  --clean-global            Remove global Antigravity symlinks"
+    echo "  -h, --help                Show this help message"
     echo ""
 }
 
@@ -32,16 +39,19 @@ ensure_executable() {
 
 install_git_hooks() {
     echo "=== Installing Deterministic Git pre-push Hooks ==="
+    echo "Target Directory: ${PROJECTS_ROOT}"
     ensure_executable
     local count=0
-    while IFS= read -r -d '' git_dir; do
-        local repo_dir
-        repo_dir="$(dirname "$git_dir")"
-        mkdir -p "${git_dir}/hooks"
-        ln -sfn "${SOURCE_DIR}/scripts/git-pre-push.sh" "${git_dir}/hooks/pre-push"
-        echo "   - Linked pre-push hook -> ${repo_dir}"
-        count=$((count + 1))
-    done < <(find "${PROJECTS_ROOT}" -maxdepth 3 -name ".git" -type d -print0 2>/dev/null)
+    if [ -d "${PROJECTS_ROOT}" ]; then
+        while IFS= read -r -d '' git_dir; do
+            local repo_dir
+            repo_dir="$(dirname "$git_dir")"
+            mkdir -p "${git_dir}/hooks"
+            ln -sfn "${SOURCE_DIR}/scripts/git-pre-push.sh" "${git_dir}/hooks/pre-push"
+            echo "   - Linked pre-push hook -> ${repo_dir}"
+            count=$((count + 1))
+        done < <(find "${PROJECTS_ROOT}" -maxdepth 3 -name ".git" -type d -print0 2>/dev/null)
+    fi
     echo "✅ Installed deterministic pre-push hooks across ${count} repositories."
     echo ""
 }
@@ -49,6 +59,7 @@ install_git_hooks() {
 setup_global() {
     echo "=== Configuring Global Google Antigravity SDLC Environment ==="
     echo "Source: ${SOURCE_DIR}"
+    echo "Home:   ${HOME}"
     echo ""
     ensure_executable
 
@@ -99,8 +110,8 @@ setup_global() {
     )
     for target_dir in "${agent_targets[@]}"; do
         mkdir -p "$target_dir"
-        # Clean obsolete engineer-webchatbot symlink if present
-        rm -f "${target_dir}/engineer-webchatbot.md"
+        # Remove any obsolete webchatbot symlinks
+        rm -f "${target_dir}/engineer-webchatbot.md" "${target_dir}/engineer-webchatbot.md.bak"
         for agent_file in "${SOURCE_DIR}/agents"/*.md; do
             if [ -f "$agent_file" ]; then
                 ln -sfn "$agent_file" "${target_dir}/$(basename "$agent_file")"
@@ -179,16 +190,48 @@ clean_global() {
     echo "✅ Global symlinks cleaned."
 }
 
-if [ $# -eq 0 ] || [ "${1:-}" = "--global" ]; then
-    setup_global
-elif [ "$1" = "--install-git-hooks" ]; then
-    install_git_hooks
-elif [ "$1" = "--clean-global" ]; then
-    clean_global
-elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    print_usage
-else
-    echo "Unknown option: $1"
-    print_usage
-    exit 1
-fi
+# Parse optional arguments
+POSITIONAL=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --projects-dir)
+            PROJECTS_ROOT="$2"
+            shift 2
+            ;;
+        --global)
+            ACTION="global"
+            shift
+            ;;
+        --install-git-hooks)
+            ACTION="git-hooks"
+            shift
+            ;;
+        --clean-global)
+            ACTION="clean"
+            shift
+            ;;
+        -h|--help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            print_usage
+            exit 1
+            ;;
+    esac
+done
+
+ACTION="${ACTION:-global}"
+
+case "$ACTION" in
+    global)
+        setup_global
+        ;;
+    git-hooks)
+        install_git_hooks
+        ;;
+    clean)
+        clean_global
+        ;;
+esac
