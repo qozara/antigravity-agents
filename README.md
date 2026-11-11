@@ -6,80 +6,6 @@ It separates **always-on system invariants (Rules)** from **progressive-disclosu
 
 ---
 
-## 🧠 November 2026 Model Architecture & Tiering
-
-| Tier / Role | Model Selection | Frontmatter Config | Execution Purpose |
-| :--- | :--- | :--- | :--- |
-| **Primary Orchestrator** | **Gemini 4 Carbon** (High thinking) or **Gemini 4 Argon** (Medium thinking) | Active session / `/plan` | Formulates architecture, plans, blast-radius boundaries, quality gate verifications, and PR reviews. |
-| **System Architect** (`@architect`) | **Frontier Tier** (Gemini 4 Carbon / Argon) | `model: pro` | Complex schema design (zod/RxDB/SQL), API contracts, Mermaid sequence/C4 diagrams, and ADR authoring. |
-| **TDD Engineer** (`@engineer`) | **Gemini 3.8 Flash** | `model: flash` | Single-pass TDD (Red-Green-Refactor), surgical file edits, component scaffolding, and lint/type error fixes. |
-| **QA / SDET** (`@tester`) | **Gemini 3.8 Flash** | `model: flash` | Unit test specification tables, gap analysis, failing reproduction tests, and automated integration/E2E test suites. |
-| **Business Analyst** (`@analyst`) | **Gemini 3.8 Flash** | `model: flash` | Scope boundaries, Non-Functional Requirements (NFRs), and Gherkin acceptance criteria (`Given/When/Then`). |
-| **UI/UX Designer** (`@designer`) | **Gemini 3.8 Flash** | `model: flash` | User flows (Mermaid.js), component wireframe specifications, and WCAG 2.2 accessibility verification. |
-
-### 🚀 Escalation Modes (On-Demand Multi-Agent Reasoning)
-- **`/boost` (Deep Reasoning Pipeline):** For tough engineering problems requiring iterative multi-round verification:
-  - Concurrency bugs, race conditions, deadlocks, and thread synchronization issues.
-  - Complex algorithmic optimization (SIMD, graph traversals, data structures).
-  - Deep root-cause investigation across unfamiliar, multi-module execution paths.
-  - Non-trivial multi-file refactoring with high regression risk.
-- **`/swarm` (Shared-Board Coordination):** Coordinates parallel worker agents communicating via a shared message board with `@mentions`.
-- **`/teamwork` (Long-Horizon Campaigns):** Multi-role collaborative agent teams for long-horizon multi-day campaigns.
-
-> **Model Lifecycle Note:** Claude 4.6 and GPT-OSS-120b are sunsetting in mid-November 2026. For Claude-based sessions, use Claude Opus 5.5 (Thinking) or Claude Sonnet 5.5 (Thinking).
-
----
-
-## 📂 Repository Architecture
-
-```
-antigravity-agents/
-├── .agents/
-│   ├── rules/                           # Always-On Global Invariants (~/.gemini/config/rules/)
-│   │   ├── sdlc-lifecycle-gates.md      # Mandatory 4-phase SDLC gates & strict anti-slop invariants
-│   │   └── agent-orchestration.md       # Single-conversation orchestration & Flash subagent routing
-│   ├── agents/                          # Custom Subagents (~/.gemini/config/agents/)
-│   │   ├── architect.md                 # System Architect [model: pro] — Schemas, Contracts, ADRs
-│   │   ├── engineer.md                  # TDD Engineer [model: flash] — Red-Green-Refactor & Edits
-│   │   ├── tester.md                    # QA / SDET [model: flash] — Breaker Specs & Test Suites
-│   │   ├── analyst.md                   # Business Analyst [model: flash] — Scope, NFRs, Gherkin
-│   │   └── designer.md                  # UX/UI Designer [model: flash] — Flows, Wireframes, WCAG 2.2
-│   ├── skills/                          # Progressive-Disclosure Skills & Slash Commands (/skill)
-│   │   ├── feature-lifecycle/SKILL.md   # /feature-lifecycle — Single-conversation Feature SDLC
-│   │   ├── refactor-lifecycle/SKILL.md  # /refactor-lifecycle — Single-conversation Refactoring SDLC
-│   │   ├── bugfix-lifecycle/SKILL.md    # /bugfix-lifecycle — Single-conversation Bug-Fix SDLC
-│   │   ├── direct/SKILL.md              # /direct — Surgical/minimal execution (bypasses SDLC ceremony)
-│   │   ├── analyze/SKILL.md             # /analyze — Strict read-only investigation & proposal mode
-│   │   ├── predeploy-gate/              # /predeploy-gate — Deterministic Gate Runner + Script
-│   │   │   ├── SKILL.md
-│   │   │   └── scripts/verify-gates.sh  # Auto-detects typecheck, lint, test, npm audit, build
-│   │   ├── c4-architecture-c4-architecture/SKILL.md
-│   │   ├── codebase-cleanup-tech-debt/SKILL.md
-│   │   ├── e2e-testing-patterns/SKILL.md
-│   │   ├── frontend-mobile-development-component-scaffold/SKILL.md
-│   │   ├── react-modernization/SKILL.md
-│   │   ├── security-auditor/SKILL.md
-│   │   ├── security-scanning-security-hardening/SKILL.md
-│   │   ├── tdd-workflows-tdd-cycle/SKILL.md
-│   │   ├── typescript-pro/SKILL.md
-│   │   └── vercel-react-best-practices/SKILL.md
-│   ├── workflows/                       # Backward-Compatible Workflow Wrappers
-│   │   ├── feature-lifecycle.md
-│   │   ├── refactor-lifecycle.md
-│   │   ├── bugfix-lifecycle.md
-│   │   ├── direct.md
-│   │   └── analyze.md
-│   ├── scripts/                         # Deterministic Hook Scripts
-│   │   ├── pre-tool-guard.sh            # Antigravity PreToolUse hook blocking main pushes & running gates
-│   │   └── git-pre-push.sh              # Git .git/hooks/pre-push deterministic gate wrapper
-│   └── hooks.json                       # Antigravity Lifecycle Hooks configuration
-├── setup-symlinks.sh                    # Portable global symlink & git-hook installer
-├── .gitignore                           # Git ignore rules for OS, temporary, and sensitive files
-└── README.md
-```
-
----
-
 ## 🚀 Replicable Setup on Any Computer
 
 This setup is fully portable and uses dynamic `$HOME` resolution without hardcoded paths or personal credentials.
@@ -159,6 +85,80 @@ To instantly detect Antigravity setup misconfigurations (such as unlinked rules,
 - **Badge Missing entirely:** Antigravity global rules are not active. Check that `./setup-symlinks.sh` was executed and that `~/.gemini/config/rules/` contains the linked rules.
 - **`skill: none` when invoking a workflow:** The skill was not recognized by Antigravity. Check that `~/.gemini/config/skills/<skill-name>` symlink is intact.
 - **Unexpected `agent:` name:** Persona routing or delegation did not occur as expected (e.g. running inline on orchestrator instead of subagent).
+
+---
+
+## 📂 Repository Architecture
+
+```
+antigravity-agents/
+├── .agents/
+│   ├── rules/                           # Always-On Global Invariants (~/.gemini/config/rules/)
+│   │   ├── sdlc-lifecycle-gates.md      # Mandatory 4-phase SDLC gates & strict anti-slop invariants
+│   │   └── agent-orchestration.md       # Single-conversation orchestration & Flash subagent routing
+│   ├── agents/                          # Custom Subagents (~/.gemini/config/agents/)
+│   │   ├── architect.md                 # System Architect [model: pro] — Schemas, Contracts, ADRs
+│   │   ├── engineer.md                  # TDD Engineer [model: flash] — Red-Green-Refactor & Edits
+│   │   ├── tester.md                    # QA / SDET [model: flash] — Breaker Specs & Test Suites
+│   │   ├── analyst.md                   # Business Analyst [model: flash] — Scope, NFRs, Gherkin
+│   │   └── designer.md                  # UX/UI Designer [model: flash] — Flows, Wireframes, WCAG 2.2
+│   ├── skills/                          # Progressive-Disclosure Skills & Slash Commands (/skill)
+│   │   ├── feature-lifecycle/SKILL.md   # /feature-lifecycle — Single-conversation Feature SDLC
+│   │   ├── refactor-lifecycle/SKILL.md  # /refactor-lifecycle — Single-conversation Refactoring SDLC
+│   │   ├── bugfix-lifecycle/SKILL.md    # /bugfix-lifecycle — Single-conversation Bug-Fix SDLC
+│   │   ├── direct/SKILL.md              # /direct — Surgical/minimal execution (bypasses SDLC ceremony)
+│   │   ├── analyze/SKILL.md             # /analyze — Strict read-only investigation & proposal mode
+│   │   ├── predeploy-gate/              # /predeploy-gate — Deterministic Gate Runner + Script
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/verify-gates.sh  # Auto-detects typecheck, lint, test, npm audit, build
+│   │   ├── c4-architecture-c4-architecture/SKILL.md
+│   │   ├── codebase-cleanup-tech-debt/SKILL.md
+│   │   ├── e2e-testing-patterns/SKILL.md
+│   │   ├── frontend-mobile-development-component-scaffold/SKILL.md
+│   │   ├── react-modernization/SKILL.md
+│   │   ├── security-auditor/SKILL.md
+│   │   ├── security-scanning-security-hardening/SKILL.md
+│   │   ├── tdd-workflows-tdd-cycle/SKILL.md
+│   │   ├── typescript-pro/SKILL.md
+│   │   └── vercel-react-best-practices/SKILL.md
+│   ├── workflows/                       # Backward-Compatible Workflow Wrappers
+│   │   ├── feature-lifecycle.md
+│   │   ├── refactor-lifecycle.md
+│   │   ├── bugfix-lifecycle.md
+│   │   ├── direct.md
+│   │   └── analyze.md
+│   ├── scripts/                         # Deterministic Hook Scripts
+│   │   ├── pre-tool-guard.sh            # Antigravity PreToolUse hook blocking main pushes & running gates
+│   │   └── git-pre-push.sh              # Git .git/hooks/pre-push deterministic gate wrapper
+│   └── hooks.json                       # Antigravity Lifecycle Hooks configuration
+├── setup-symlinks.sh                    # Portable global symlink & git-hook installer
+├── .gitignore                           # Git ignore rules for OS, temporary, and sensitive files
+└── README.md
+```
+
+---
+
+## 🧠 November 2026 Model Architecture & Tiering
+
+| Tier / Role | Model Selection | Frontmatter Config | Execution Purpose |
+| :--- | :--- | :--- | :--- |
+| **Primary Orchestrator** | **Gemini 4 Carbon** (High thinking) or **Gemini 4 Argon** (Medium thinking) | Active session / `/plan` | Formulates architecture, plans, blast-radius boundaries, quality gate verifications, and PR reviews. |
+| **System Architect** (`@architect`) | **Frontier Tier** (Gemini 4 Carbon / Argon) | `model: pro` | Complex schema design (zod/RxDB/SQL), API contracts, Mermaid sequence/C4 diagrams, and ADR authoring. |
+| **TDD Engineer** (`@engineer`) | **Gemini 3.8 Flash** | `model: flash` | Single-pass TDD (Red-Green-Refactor), surgical file edits, component scaffolding, and lint/type error fixes. |
+| **QA / SDET** (`@tester`) | **Gemini 3.8 Flash** | `model: flash` | Unit test specification tables, gap analysis, failing reproduction tests, and automated integration/E2E test suites. |
+| **Business Analyst** (`@analyst`) | **Gemini 3.8 Flash** | `model: flash` | Scope boundaries, Non-Functional Requirements (NFRs), and Gherkin acceptance criteria (`Given/When/Then`). |
+| **UI/UX Designer** (`@designer`) | **Gemini 3.8 Flash** | `model: flash` | User flows (Mermaid.js), component wireframe specifications, and WCAG 2.2 accessibility verification. |
+
+### 🚀 Escalation Modes (On-Demand Multi-Agent Reasoning)
+- **`/boost` (Deep Reasoning Pipeline):** For tough engineering problems requiring iterative multi-round verification:
+  - Concurrency bugs, race conditions, deadlocks, and thread synchronization issues.
+  - Complex algorithmic optimization (SIMD, graph traversals, data structures).
+  - Deep root-cause investigation across unfamiliar, multi-module execution paths.
+  - Non-trivial multi-file refactoring with high regression risk.
+- **`/swarm` (Shared-Board Coordination):** Coordinates parallel worker agents communicating via a shared message board with `@mentions`.
+- **`/teamwork` (Long-Horizon Campaigns):** Multi-role collaborative agent teams for long-horizon multi-day campaigns.
+
+> **Model Lifecycle Note:** Claude 4.6 and GPT-OSS-120b are sunsetting in mid-November 2026. For Claude-based sessions, use Claude Opus 5.5 (Thinking) or Claude Sonnet 5.5 (Thinking).
 
 ---
 
