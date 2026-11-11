@@ -5,6 +5,8 @@ description: Code hardening, dependency vulnerability scanning, secure headers, 
 
 # Application Security Hardening
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: security-scanning-security-hardening`.
+
 ## Hardening Guidelines
 1. **HTTP Security Headers:**
    - Configure CSP (Content Security Policy), HSTS, X-Content-Type-Options, and X-Frame-Options.

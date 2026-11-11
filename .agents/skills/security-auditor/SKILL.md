@@ -5,6 +5,8 @@ description: Security auditing, vulnerability assessment, OWASP Top 10 mitigatio
 
 # Security Auditor & Vulnerability Assessment
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: security-auditor`.
+
 ## Focus Areas
 1. **OWASP Top 10 Mitigation:**
    - Injection prevention (SQL, Command, NoSQL).

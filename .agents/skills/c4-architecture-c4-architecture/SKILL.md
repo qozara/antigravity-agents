@@ -5,6 +5,8 @@ description: C4 software architecture modeling (Context, Containers, Components,
 
 # C4 Architecture Modeling & Diagramming
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: c4-architecture-c4-architecture`.
+
 ## Levels
 1. **Level 1: System Context Diagram:** Shows high-level users and external systems.
 2. **Level 2: Container Diagram:** High-level technical architecture (web apps, databases, API gateways, microservices).

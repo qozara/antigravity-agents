@@ -43,3 +43,16 @@ Operate as a high-leverage orchestrator in the primary conversation while minimi
 - **Black-Box Script Execution:** Execute bundled helper scripts (such as `verify-gates.sh`) directly; inspect only exit codes and concise failure output rather than reading full script source code into context.
 - **Surgical Reads & Edits:** Use `grep_search` and line-bounded `view_file` (`StartLine`/`EndLine`) instead of reading entire large files, and apply targeted `replace_file_content` / `multi_replace_file_content` edits.
 - **Parallel Dispatch:** When subtasks touch independent packages or files, invoke subagents concurrently in a single turn rather than sequentially.
+
+## 5. Mandatory One-Line Response Feedback Trace (Continuous Configuration Proof)
+To enable instant verification of active Antigravity rules, skills, and agents across all prompts and projects (and rapidly detect setup misconfigurations with minimal token overhead):
+- **Every assistant response (primary orchestrator and subagents) MUST start on line 1 with a single-line trace badge:**
+  `> 🧭 [rules: <active_rules> | skill: <active_skill|none> | agent: <role>]`
+- **Field Definitions (Traced back to repository contents):**
+  - `rules:` Comma-separated names of active rules from `.agents/rules/` (typically `agent-orchestration, sdlc-lifecycle-gates`).
+  - `skill:` Exact name of active skill/workflow from `.agents/skills/` or `.agents/workflows/` (e.g., `feature-lifecycle`, `bugfix-lifecycle`, `typescript-pro`, `predeploy-gate`), or `none` if answering standard prompts without specialized skills.
+  - `agent:` Active persona from `.agents/agents/` (e.g., `orchestrator`, `architect`, `engineer`, `tester`, `analyst`, `designer`).
+- **Misconfiguration Signals:**
+  - Missing top-line badge $\rightarrow$ Antigravity global rules not loaded or symlinks broken.
+  - `skill: none` during a workflow task $\rightarrow$ Workflow/skill was not triggered or recognized.
+  - Unexpected `agent:` value $\rightarrow$ Subagent delegation or role routing failure.

@@ -7,6 +7,9 @@ description: End-to-end single-conversation feature delivery workflow with propo
 
 Run the complete feature software development lifecycle from a single conversation while delegating isolated work to subagents and enforcing deterministic quality gates.
 
+> **Feedback Trace Invariant:** Every response during feature delivery must start on line 1 with:
+> `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: feature-lifecycle | agent: <role>]`
+
 ## Decision Tree: Proportional Stage Selection
 Before spawning subagents, classify the feature complexity to avoid unnecessary token overhead:
 - **Tier A — UI / Multi-Component / Schema Feature:** Run all phases (UX/Scope check $\rightarrow$ Architecture & ADR $\rightarrow$ QA Spec & TDD $\rightarrow$ Deterministic Gates).

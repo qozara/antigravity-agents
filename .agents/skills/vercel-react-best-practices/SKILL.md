@@ -5,6 +5,8 @@ description: Comprehensive engineering guidelines, performance optimization, com
 
 # React Engineering Knowledge Base & Agent Skills
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: vercel-react-best-practices`.
+
 This document contains comprehensive engineering guidelines and agent skills for React, React Native, and Component Architecture.
 
 ## Part 1: React Best Practices

@@ -7,6 +7,9 @@ description: Runs deterministic pre-deploy quality gates (branch policy, path le
 
 Executes the bundled black-box verification script to deterministically validate all repository invariants before completing a task or pushing a branch.
 
+> **Feedback Trace Invariant:** Every response during gate execution must start on line 1 with:
+> `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: predeploy-gate | agent: <role>]`
+
 ## Execution Protocol
 
 1. **Run the Bundled Verification Script (Do NOT read script source into context):**

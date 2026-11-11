@@ -7,6 +7,9 @@ description: End-to-end single-conversation bug-fix workflow enforcing root-caus
 
 Diagnose, reproduce, and resolve defects from a single conversation using strict test-first reproduction and deterministic verification gates.
 
+> **Feedback Trace Invariant:** Every response during bug-fix execution must start on line 1 with:
+> `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: bugfix-lifecycle | agent: <role>]`
+
 ## Phase 1: Triage, Root-Cause Diagnosis & Branch Setup
 1. **Branch Check:** Create or switch to `fix/<issue-or-bug-name>` from `main`.
 2. **Root-Cause Isolation:**

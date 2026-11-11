@@ -29,6 +29,7 @@ Before declaring any task complete, opening a PR, or pushing a branch, execute a
 
 ## Phase 4: Delivery & Integrity Guardrails
 - **Walkthrough Proof:** Summarize diffs, test output, and gate verification results in the final walkthrough.
+- **Response Feedback Trace Badge:** Every response must maintain the top-line trace badge (`> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: <active-skill|none> | agent: <role>]`) to continuously verify active rules, skills, and agent identity.
 - **Strict Integrity Rules (Zero Tolerance):**
   - Never delete, skip (`.skip`), or weaken assertions in existing tests to force a green build.
   - Never commit generated databases (`.sqlite`, `.ndjson`), `.env` secrets, or ephemeral `implementation_plan.md` files unless tracked by the repo.

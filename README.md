@@ -116,6 +116,35 @@ Because global rules (`sdlc-lifecycle-gates.md` and `agent-orchestration.md`) ar
 
 ---
 
+## 🧭 Continuous Configuration Proof: Response Feedback Trace
+
+To instantly detect Antigravity setup misconfigurations (such as unlinked rules, unregistered skills, or misrouted subagents) across all workspaces without consuming excessive tokens, **every agent response starts on line 1 with a single-line trace badge**:
+
+```markdown
+> 🧭 [rules: <active_rules> | skill: <active_skill|none> | agent: <role>]
+```
+
+### Examples & Traceability Matrix
+
+| Prompt Scenario | Line 1 Feedback Trace Badge | Repo Reference |
+| :--- | :--- | :--- |
+| **Standard Prompt / Q&A** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: none \| agent: orchestrator]` | `.agents/rules/` |
+| **Feature Delivery (`/feature-lifecycle`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: feature-lifecycle \| agent: orchestrator]` | `.agents/skills/feature-lifecycle/` |
+| **Refactoring (`/refactor-lifecycle`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: refactor-lifecycle \| agent: orchestrator]` | `.agents/skills/refactor-lifecycle/` |
+| **Bug Fix (`/bugfix-lifecycle`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: bugfix-lifecycle \| agent: orchestrator]` | `.agents/skills/bugfix-lifecycle/` |
+| **TDD Subagent (`@engineer`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: tdd-workflows-tdd-cycle \| agent: engineer]` | `.agents/agents/engineer.md` |
+| **Architecture Subagent (`@architect`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: c4-architecture-c4-architecture \| agent: architect]` | `.agents/agents/architect.md` |
+| **QA / Breaker Subagent (`@tester`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: e2e-testing-patterns \| agent: tester]` | `.agents/agents/tester.md` |
+| **Pre-Deploy Gate (`/predeploy-gate`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: predeploy-gate \| agent: orchestrator]` | `.agents/skills/predeploy-gate/` |
+
+### 🔍 Misconfiguration Diagnosis Guide
+
+- **Badge Missing entirely:** Antigravity global rules are not active. Check that `./setup-symlinks.sh` was executed and that `~/.gemini/config/rules/` contains the linked rules.
+- **`skill: none` when invoking a workflow:** The skill was not recognized by Antigravity. Check that `~/.gemini/config/skills/<skill-name>` symlink is intact.
+- **Unexpected `agent:` name:** Persona routing or delegation did not occur as expected (e.g. running inline on orchestrator instead of subagent).
+
+---
+
 ## 🔒 Privacy & Public Distribution Invariants
 
 This repository is built for public distribution on GitHub with strict data hygiene:

@@ -5,6 +5,8 @@ description: Modernizing legacy React codebases to React 18/19, Server Component
 
 # React Modernization & Architecture Upgrade
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: react-modernization`.
+
 ## Key Practices
 1. **Functional Components & Hooks:** Replace class components and lifecycle methods (`componentDidMount`, `componentWillReceiveProps`) with functional components and custom hooks.
 2. **React 19 Features:** Utilize modern `use()` hook, action hooks (`useActionState`, `useOptimistic`), and direct `ref` prop passing.

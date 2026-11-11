@@ -7,6 +7,9 @@ description: End-to-end single-conversation refactoring and tech-debt workflow e
 
 Execute safe, behavior-preserving structural refactorings from a single conversation with zero functional regressions.
 
+> **Feedback Trace Invariant:** Every response during refactoring must start on line 1 with:
+> `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: refactor-lifecycle | agent: <role>]`
+
 ## Phase 1: Baseline Snapshot & Blast-Radius Analysis (`/plan`)
 1. **Branch Check:** Create or switch to `refactor/<short-name>` from `main`.
 2. **Baseline Gate Run:** Run tests and typecheck *before* touching code to confirm a clean starting baseline:

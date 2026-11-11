@@ -9,7 +9,11 @@
 
 set -euo pipefail
 
-WORKSPACE_DIR="${1:-$(pwd)}"
+WORKSPACE_DIR="$(pwd)"
+if [[ $# -gt 0 && "${1:-}" != --* && "${1:-}" != -* ]]; then
+  WORKSPACE_DIR="$1"
+  shift
+fi
 cd "$WORKSPACE_DIR"
 
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
@@ -50,7 +54,7 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         echo "❌ [GATE 2 FAILED] Generated database/data artifact detected in git status: $f"
         exit 1
       fi
-      if [[ -f "$f" && ! "$f" =~ setup-symlinks\.sh ]]; then
+      if [[ -f "$f" && ! "$f" =~ setup-symlinks\.sh && ! "$f" =~ verify-gates\.sh ]]; then
         if grep -En "(/Users/[a-zA-Z0-9_-]+|file:///Users/)" "$f" >/dev/null 2>&1; then
           echo "❌ [GATE 2 FAILED] Absolute workstation path leaked in file: $f"
           grep -En "(/Users/[a-zA-Z0-9_-]+|file:///Users/)" "$f" || true
