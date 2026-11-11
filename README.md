@@ -1,22 +1,30 @@
-# Antigravity Agents, Workflows & Skills (Qozara)
+# Antigravity Global SDLC Rules, Skills, Subagents & Deterministic Guards (Qozara)
 
-This repository contains modular subagent personas, engineering skills, and deterministic SDLC workflows for **Google Antigravity IDE**. It pairs high-level cognitive orchestration personas with granular execution skills.
+Centralized, token-optimized configuration for **Google Antigravity** (App, IDE, and CLI). Separates **always-on system invariants (Rules)** from **progressive-disclosure execution recipes (Skills/Workflows)**, delegates isolated code churn to **Flash-tier subagents**, and enforces **deterministic quality gates** via Antigravity Lifecycle Hooks (`hooks.json`) and Git `pre-push` hooks.
 
 ---
 
-## 📂 Repository Structure
+## 📂 Repository Architecture
 
 ```
 antigravity-agents/
 ├── .agents/
-│   ├── agents/                          # Custom Agent Personas (@persona)
-│   │   ├── designer.md                  # Product UX/UI Designer (Aura)
-│   │   ├── analyst.md                   # Software Business Analyst (Epics & Gherkin User Stories)
-│   │   ├── architect.md                 # Software Architect Agent (TDD, Diagrams, API & Task Breakdown)
-│   │   ├── engineer.md                  # Software Engineer Agent (Native Antigravity TDD & Direct File Edits)
-│   │   ├── engineer-webchatbot.md       # Software Engineer Agent (Hybrid Web Chatbot & PatchPilot Unified Diffs)
-│   │   └── tester.md                    # Software QA/Test Engineer (Gap Analysis, Unit Specs, Breaker Tests)
-│   ├── skills/                          # Progressive On-Demand Engineering Skills
+│   ├── rules/                           # Always-On Global Invariants (~/.gemini/config/rules/)
+│   │   ├── sdlc-lifecycle-gates.md      # Mandatory 4-phase SDLC gates & strict anti-slop invariants
+│   │   └── agent-orchestration.md       # Single-conversation orchestration & Flash subagent routing
+│   ├── agents/                          # Custom Subagents (~/.gemini/config/agents/)
+│   │   ├── architect.md                 # System Architect [model: pro] — Schemas, Contracts, ADRs
+│   │   ├── engineer.md                  # TDD Engineer [model: flash] — Red-Green-Refactor & Edits
+│   │   ├── tester.md                    # QA / SDET [model: flash] — Breaker Specs & Test Suites
+│   │   ├── analyst.md                   # Business Analyst [model: flash] — Scope, NFRs, Gherkin
+│   │   └── designer.md                  # UX/UI Designer [model: flash] — Flows, Wireframes, WCAG 2.2
+│   ├── skills/                          # Progressive-Disclosure Skills & Slash Commands (/skill)
+│   │   ├── feature-lifecycle/SKILL.md   # /feature-lifecycle — Single-conversation Feature SDLC
+│   │   ├── refactor-lifecycle/SKILL.md  # /refactor-lifecycle — Single-conversation Refactoring SDLC
+│   │   ├── bugfix-lifecycle/SKILL.md    # /bugfix-lifecycle — Single-conversation Bug-Fix SDLC
+│   │   ├── predeploy-gate/              # /predeploy-gate — Deterministic Gate Runner + Script
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/verify-gates.sh  # Auto-detects typecheck, lint, test, npm audit, build
 │   │   ├── c4-architecture-c4-architecture/SKILL.md
 │   │   ├── codebase-cleanup-tech-debt/SKILL.md
 │   │   ├── e2e-testing-patterns/SKILL.md
@@ -27,17 +35,23 @@ antigravity-agents/
 │   │   ├── tdd-workflows-tdd-cycle/SKILL.md
 │   │   ├── typescript-pro/SKILL.md
 │   │   └── vercel-react-best-practices/SKILL.md
-│   └── workflows/                       # Slash-Command Workflows (/workflow)
-│       └── feature-lifecycle.md         # End-to-End Chained Feature Development Lifecycle
-├── setup-symlinks.sh                    # Symlink orchestrator linking to global ~/.gemini and ~/.antigravity
+│   ├── workflows/                       # Backward-Compatible Workflow Wrappers
+│   │   ├── feature-lifecycle.md
+│   │   ├── refactor-lifecycle.md
+│   │   └── bugfix-lifecycle.md
+│   ├── scripts/                         # Deterministic Hook Scripts
+│   │   ├── pre-tool-guard.sh            # Antigravity PreToolUse hook blocking main pushes & running gates
+│   │   └── git-pre-push.sh              # Git .git/hooks/pre-push deterministic gate wrapper
+│   └── hooks.json                       # Antigravity Lifecycle Hooks configuration
+├── setup-symlinks.sh                    # Global symlink & git-hook installer
 └── README.md
 ```
 
 ---
 
-## 🚀 Global Installation (All Workspaces)
+## 🚀 Global Installation Across All Workspaces
 
-To make all skills, agent personas, and workflows globally available in Antigravity across **every project**:
+Run once from terminal to link rules, skills, subagents, `hooks.json`, and Git `pre-push` hooks across your workstation:
 
 ```bash
 cd ~/VSCodeProjects/qozara/antigravity-agents
@@ -45,16 +59,17 @@ chmod +x setup-symlinks.sh
 ./setup-symlinks.sh
 ```
 
-This symlinks all assets into the global locations checked by Antigravity:
-- **Global Skills:** `~/.gemini/antigravity/skills/` and `~/.gemini/config/skills/`
-- **Global Agent Personas:** `~/.gemini/config/agents/`, `~/.gemini/antigravity/agents/`, and `~/.gemini/antigravity/subagents/`
-- **Global Workflows:** `~/.gemini/config/global_workflows/` and `~/.gemini/antigravity/workflows/`
-- **Root Symlink:** `~/.antigravity/agents`
-
 ---
 
-## 🛠️ Usage in Antigravity IDE
+## 💬 Single-Conversation Trigger Prompts
 
-- **Agent Personas (`@`)**: `@designer`, `@analyst`, `@architect`, `@tester`, `@engineer`
-- **Workflows (`/`)**: `/feature-lifecycle`
-- **Skills**: Auto-discovered progressively based on task relevance (`vercel-react-best-practices`, `typescript-pro`, `tdd-workflows-tdd-cycle`, etc.)
+Because global rules (`sdlc-lifecycle-gates.md` and `agent-orchestration.md`) are `always_on` and lifecycle skills are exposed as `/` slash commands, you can trigger any full SDLC loop from a single prompt:
+
+- **New Feature:**
+  > `/feature-lifecycle Implement [feature description]. Orchestrate planning (/plan), delegate TDD specs and implementation to @tester and @engineer, run /predeploy-gate, update docs/i18n, and prepare the feature branch.`
+
+- **Refactoring / Tech Debt:**
+  > `/refactor-lifecycle Refactor [module/component]. Verify baseline tests first, map blast radius in /plan, delegate atomic transformations to @engineer, and verify zero regressions with /predeploy-gate.`
+
+- **Bug Fix:**
+  > `/bugfix-lifecycle Fix [issue/bug description]. Isolate root cause, write a failing reproduction test first via @tester/@engineer, apply the minimal surgical fix, and verify all checks with /predeploy-gate.`

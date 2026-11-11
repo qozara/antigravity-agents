@@ -2,149 +2,187 @@
 # ==============================================================================
 # setup-symlinks.sh
 #
-# Configures global Antigravity IDE access for Qozara subagents, workflows & skills.
-# Links all custom definitions directly to global directories (~/.gemini and ~/.antigravity)
-# so they are automatically available in ALL workspaces without per-project setup.
+# Configures global Google Antigravity access (App, IDE, and CLI) for Qozara
+# rules, skills (slash-invocable workflows), custom subagents, lifecycle hooks,
+# and deterministic Git pre-push hooks across all workspaces.
 # ==============================================================================
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="${SCRIPT_DIR}/.agents"
+PROJECTS_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 print_usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  --global              Install/symlink globally across all Antigravity paths (Default)"
+    echo "  --global              Symlink rules, skills, subagents, hooks & git hooks globally (Default)"
+    echo "  --install-git-hooks   Install deterministic pre-push hook into all Git repos in ${PROJECTS_ROOT}"
     echo "  --clean-global        Remove global Antigravity symlinks"
     echo "  -h, --help            Show this help message"
     echo ""
 }
 
+ensure_executable() {
+    chmod +x "${SOURCE_DIR}/skills/predeploy-gate/scripts/verify-gates.sh" 2>/dev/null || true
+    chmod +x "${SOURCE_DIR}/scripts/pre-tool-guard.sh" 2>/dev/null || true
+    chmod +x "${SOURCE_DIR}/scripts/git-pre-push.sh" 2>/dev/null || true
+}
+
+install_git_hooks() {
+    echo "=== Installing Deterministic Git pre-push Hooks ==="
+    ensure_executable
+    local count=0
+    while IFS= read -r -d '' git_dir; do
+        local repo_dir
+        repo_dir="$(dirname "$git_dir")"
+        mkdir -p "${git_dir}/hooks"
+        ln -sfn "${SOURCE_DIR}/scripts/git-pre-push.sh" "${git_dir}/hooks/pre-push"
+        echo "   - Linked pre-push hook -> ${repo_dir}"
+        count=$((count + 1))
+    done < <(find "${PROJECTS_ROOT}" -maxdepth 3 -name ".git" -type d -print0 2>/dev/null)
+    echo "✅ Installed deterministic pre-push hooks across ${count} repositories."
+    echo ""
+}
+
 setup_global() {
-    echo "=== Configuring Global Antigravity Access ==="
+    echo "=== Configuring Global Google Antigravity SDLC Environment ==="
     echo "Source: ${SOURCE_DIR}"
     echo ""
+    ensure_executable
 
-    # 1. Global Skills Directories
-    # Antigravity discovers global skills from ~/.gemini/antigravity/skills and ~/.gemini/config/skills
-    local skill_targets=(
-        "${HOME}/.gemini/antigravity/skills"
-        "${HOME}/.gemini/config/skills"
-        "${HOME}/.antigravity/skills"
+    # 1. Global Rules (~/.gemini/config/rules/*.md)
+    local rule_targets=(
+        "${HOME}/.gemini/config/rules"
     )
+    for target_dir in "${rule_targets[@]}"; do
+        mkdir -p "$target_dir"
+        for rule_file in "${SOURCE_DIR}/rules"/*.md; do
+            if [ -f "$rule_file" ]; then
+                ln -sfn "$rule_file" "${target_dir}/$(basename "$rule_file")"
+            fi
+        done
+    done
+    echo "✅ Global Rules (always_on invariants) configured in:"
+    for target_dir in "${rule_targets[@]}"; do
+        echo "   - ${target_dir}"
+    done
+    echo ""
 
+    # 2. Global Skills & Slash-Command Workflows (~/.gemini/config/skills/<name>/SKILL.md)
+    # Antigravity App/IDE/CLI share ~/.gemini/config/skills; CLI also checks ~/.gemini/antigravity-cli/skills and ~/.gemini/skills
+    local skill_targets=(
+        "${HOME}/.gemini/config/skills"
+        "${HOME}/.gemini/antigravity-cli/skills"
+        "${HOME}/.gemini/skills"
+        "${HOME}/.gemini/antigravity/skills"
+    )
     for target_dir in "${skill_targets[@]}"; do
         mkdir -p "$target_dir"
         for skill_dir in "${SOURCE_DIR}/skills"/*; do
             if [ -d "$skill_dir" ]; then
-                local skill_name
-                skill_name="$(basename "$skill_dir")"
-                ln -sfn "$skill_dir" "${target_dir}/${skill_name}"
+                ln -sfn "$skill_dir" "${target_dir}/$(basename "$skill_dir")"
             fi
         done
     done
-    echo "✅ Global Skills configured in:"
+    echo "✅ Global Skills & Slash Workflows (/feature-lifecycle, /refactor-lifecycle, /bugfix-lifecycle, /predeploy-gate) configured in:"
     for target_dir in "${skill_targets[@]}"; do
         echo "   - ${target_dir}"
     done
     echo ""
 
-    # 2. Global Custom Agents / Personas Directories
-    # Antigravity discovers custom agents globally from ~/.gemini/config/agents and ~/.gemini/antigravity/agents
+    # 3. Global Custom Subagents (~/.gemini/config/agents/*.md)
     local agent_targets=(
         "${HOME}/.gemini/config/agents"
         "${HOME}/.gemini/antigravity/agents"
-        "${HOME}/.gemini/antigravity/subagents"
     )
-
     for target_dir in "${agent_targets[@]}"; do
         mkdir -p "$target_dir"
+        # Clean obsolete engineer-webchatbot symlink if present
+        rm -f "${target_dir}/engineer-webchatbot.md"
         for agent_file in "${SOURCE_DIR}/agents"/*.md; do
             if [ -f "$agent_file" ]; then
-                local agent_name
-                agent_name="$(basename "$agent_file")"
-                ln -sfn "$agent_file" "${target_dir}/${agent_name}"
+                ln -sfn "$agent_file" "${target_dir}/$(basename "$agent_file")"
             fi
         done
     done
-    echo "✅ Global Agent Personas configured in:"
+    echo "✅ Global Custom Subagents (@architect [pro], @engineer [flash], @tester [flash], @analyst [flash], @designer [flash]) configured in:"
     for target_dir in "${agent_targets[@]}"; do
         echo "   - ${target_dir}"
     done
     echo ""
 
-    # 3. Global Workflows Directories
-    # Antigravity discovers global workflows from ~/.gemini/config/global_workflows and ~/.gemini/antigravity/workflows
-    local workflow_targets=(
-        "${HOME}/.gemini/config/global_workflows"
-        "${HOME}/.gemini/antigravity/workflows"
-        "${HOME}/.antigravity/workflows"
-    )
+    # 4. Global Lifecycle Hooks (~/.gemini/config/hooks.json & scripts)
+    mkdir -p "${HOME}/.gemini/config/scripts"
+    ln -sfn "${SOURCE_DIR}/hooks.json" "${HOME}/.gemini/config/hooks.json"
+    for script_file in "${SOURCE_DIR}/scripts"/*.sh; do
+        if [ -f "$script_file" ]; then
+            ln -sfn "$script_file" "${HOME}/.gemini/config/scripts/$(basename "$script_file")"
+        fi
+    done
+    echo "✅ Global Lifecycle Hooks configured in:"
+    echo "   - ${HOME}/.gemini/config/hooks.json"
+    echo "   - ${HOME}/.gemini/config/scripts/"
+    echo ""
 
+    # 5. Legacy Workflows Compatibility (~/.gemini/config/workflows/*.md)
+    local workflow_targets=(
+        "${HOME}/.gemini/config/workflows"
+        "${HOME}/.gemini/antigravity/workflows"
+    )
     for target_dir in "${workflow_targets[@]}"; do
         mkdir -p "$target_dir"
         for wf_file in "${SOURCE_DIR}/workflows"/*.md; do
             if [ -f "$wf_file" ]; then
-                local wf_name
-                wf_name="$(basename "$wf_file")"
-                ln -sfn "$wf_file" "${target_dir}/${wf_name}"
+                ln -sfn "$wf_file" "${target_dir}/$(basename "$wf_file")"
             fi
         done
     done
-    echo "✅ Global Workflows configured in:"
+    echo "✅ Legacy Workflows backward-compatibility configured in:"
     for target_dir in "${workflow_targets[@]}"; do
         echo "   - ${target_dir}"
     done
     echo ""
 
-    # 4. ~/.antigravity/agents Root Symlink
-    mkdir -p "${HOME}/.antigravity"
-    ln -sfn "${SOURCE_DIR}" "${HOME}/.antigravity/agents"
-    echo "✅ Root Symlink created: ${HOME}/.antigravity/agents -> ${SOURCE_DIR}"
-    echo ""
-    echo "🎉 Global configuration complete! All skills, personas, and workflows are globally available across every workspace."
+    # 6. Install Git pre-push hooks across workspace repositories
+    install_git_hooks
+
+    echo "🎉 Global Antigravity configuration complete!"
 }
 
 clean_global() {
-    echo "=== Cleaning Global Symlinks ==="
+    echo "=== Cleaning Global Antigravity Symlinks ==="
+    for rule_file in "${SOURCE_DIR}/rules"/*.md; do
+        [ -f "$rule_file" ] && rm -f "${HOME}/.gemini/config/rules/$(basename "$rule_file")"
+    done
     for skill_dir in "${SOURCE_DIR}/skills"/*; do
         if [ -d "$skill_dir" ]; then
             local skill_name
             skill_name="$(basename "$skill_dir")"
-            rm -f "${HOME}/.gemini/antigravity/skills/${skill_name}"
             rm -f "${HOME}/.gemini/config/skills/${skill_name}"
-            rm -f "${HOME}/.antigravity/skills/${skill_name}"
+            rm -f "${HOME}/.gemini/antigravity-cli/skills/${skill_name}"
+            rm -f "${HOME}/.gemini/skills/${skill_name}"
+            rm -f "${HOME}/.gemini/antigravity/skills/${skill_name}"
         fi
     done
-
     for agent_file in "${SOURCE_DIR}/agents"/*.md; do
         if [ -f "$agent_file" ]; then
             local agent_name
             agent_name="$(basename "$agent_file")"
             rm -f "${HOME}/.gemini/config/agents/${agent_name}"
             rm -f "${HOME}/.gemini/antigravity/agents/${agent_name}"
-            rm -f "${HOME}/.gemini/antigravity/subagents/${agent_name}"
         fi
     done
-
-    for wf_file in "${SOURCE_DIR}/workflows"/*.md; do
-        if [ -f "$wf_file" ]; then
-            local wf_name
-            wf_name="$(basename "$wf_file")"
-            rm -f "${HOME}/.gemini/config/global_workflows/${wf_name}"
-            rm -f "${HOME}/.gemini/antigravity/workflows/${wf_name}"
-            rm -f "${HOME}/.antigravity/workflows/${wf_name}"
-        fi
-    done
-
-    rm -f "${HOME}/.antigravity/agents"
+    rm -f "${HOME}/.gemini/config/hooks.json"
+    rm -rf "${HOME}/.gemini/config/scripts"
     echo "✅ Global symlinks cleaned."
 }
 
 if [ $# -eq 0 ] || [ "${1:-}" = "--global" ]; then
     setup_global
+elif [ "$1" = "--install-git-hooks" ]; then
+    install_git_hooks
 elif [ "$1" = "--clean-global" ]; then
     clean_global
 elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
