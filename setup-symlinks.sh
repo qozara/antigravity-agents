@@ -110,8 +110,6 @@ setup_global() {
     )
     for target_dir in "${agent_targets[@]}"; do
         mkdir -p "$target_dir"
-        # Remove any obsolete webchatbot symlinks
-        rm -f "${target_dir}/engineer-webchatbot.md" "${target_dir}/engineer-webchatbot.md.bak"
         for agent_file in "${SOURCE_DIR}/agents"/*.md; do
             if [ -f "$agent_file" ]; then
                 ln -sfn "$agent_file" "${target_dir}/$(basename "$agent_file")"
