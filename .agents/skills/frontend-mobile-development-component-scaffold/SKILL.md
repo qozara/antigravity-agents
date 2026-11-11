@@ -5,6 +5,8 @@ description: Component scaffolding for React Native, Expo, and web responsive fr
 
 # Frontend & Mobile Component Scaffolding
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: frontend-mobile-development-component-scaffold`.
+
 ## Principles
 1. **Atomic Component Scaffolding:** Organize UI components into Atoms, Molecules, Organisms, and Templates.
 2. **Cross-Platform Compatibility:** Ensure React Native / Expo components handle safe area insets, touch feedback (`Pressable`), and platform-specific platform extensions (`.native.ts`, `.web.ts`).

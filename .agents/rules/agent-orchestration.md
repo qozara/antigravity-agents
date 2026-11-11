@@ -31,15 +31,40 @@ Operate as a high-leverage orchestrator in the primary conversation while minimi
 - **👥 Multi-Worker Coordination (`/swarm`):** Run `/swarm` when parallel workers need to coordinate and review changes across a shared message board with `@mentions`.
 - **🏗️ Long-Horizon Campaigns (`/teamwork`):** Use `/teamwork` for multi-day, multi-phase system migrations or repository-wide rebuilds.
 
-## 3. Single-Conversation Workflow Routing
-- Run complete SDLC loops from a single conversation using progressive-disclosure skills:
-  - `/feature-lifecycle`: End-to-end feature discovery, architecture, TDD implementation, and gate verification.
-  - `/refactor-lifecycle`: Baseline verification, blast-radius analysis, structural cleanup, and regression proof.
-  - `/bugfix-lifecycle`: Root-cause reproduction test, surgical fix, and full regression verification.
-  - `/predeploy-gate`: Deterministic terminal verification script (typecheck, test, security audit, build, and hygiene).
+## 3. Autonomous Intent Routing & Fine-Grained Override Matrix
+Every prompt is automatically classified into one of three execution tiers—whether you use an explicit `/` slash command OR plain natural language:
+
+1. **Tier 1 — Read-Only Analysis & Proposal (`/analyze` or implicit questions/investigations):**
+   - **Triggers:** Explicit `/analyze <prompt>`, OR natural language asking to *explain, investigate, diagnose without fixing, review architecture, or propose options/plans before coding*.
+   - **Behavior (`skill: analyze`):** Load `.agents/skills/analyze/SKILL.md`. **Strict Read-Only Lock**—never create, edit, or delete files, switch branches, or run mutating commands. Reply with grounded analysis or proposed changes only.
+
+2. **Tier 2 — Direct / Surgical Execution (`/direct` or implicit micro-edits):**
+   - **Triggers:** Explicit `/direct <prompt>`, OR natural language requesting *formatting, copy/text tweaks, comment/doc edits, single-line config changes, or "just do X without gates"*.
+   - **Behavior (`skill: direct`):** Load `.agents/skills/direct/SKILL.md`. Stop autonomous SDLC inference and perform **only** the minimal work specified (honoring any `@agent` or skill explicitly mentioned in the prompt), skipping `implementation_plan.md`, unsolicited subagents, and `/predeploy-gate`.
+
+3. **Tier 3 — Full Autonomous SDLC (`/feature-lifecycle`, `/refactor-lifecycle`, `/bugfix-lifecycle`, or implicit code changes):**
+   - **Triggers (Explicit or Implicit):**
+     - **New Feature** (`/feature-lifecycle <goal>` or *"Implement/Add X"*): Load `.agents/skills/feature-lifecycle/SKILL.md` (`skill: feature-lifecycle`).
+     - **Refactoring / Cleanup** (`/refactor-lifecycle <goal>` or *"Refactor/Clean up X"*): Load `.agents/skills/refactor-lifecycle/SKILL.md` (`skill: refactor-lifecycle`).
+     - **Bug Fix** (`/bugfix-lifecycle <goal>` or *"Fix/Resolve bug X"*): Load `.agents/skills/bugfix-lifecycle/SKILL.md` (`skill: bugfix-lifecycle`).
+     - **Gate Verification** (`/predeploy-gate` or automatic Phase 3): Execute `~/.gemini/config/skills/predeploy-gate/scripts/verify-gates.sh "$(pwd)"`.
+   - **Autonomous Execution (No Boilerplate Needed in Prompt):** Automatically create/switch to a dedicated branch, produce `implementation_plan.md`, dispatch `@tester` and `@engineer` via `invoke_subagent`, run `/predeploy-gate` (`verify-gates.sh`), and sync docs/i18n.
 
 ## 4. Context & Token Optimization Rules
 - **Progressive Disclosure:** Do not inline lengthy style guides or framework manuals into rules. Load specialized skills (`typescript-pro`, `vercel-react-best-practices`, `security-auditor`, `e2e-testing-patterns`) only when the task touches those domains.
 - **Black-Box Script Execution:** Execute bundled helper scripts (such as `verify-gates.sh`) directly; inspect only exit codes and concise failure output rather than reading full script source code into context.
 - **Surgical Reads & Edits:** Use `grep_search` and line-bounded `view_file` (`StartLine`/`EndLine`) instead of reading entire large files, and apply targeted `replace_file_content` / `multi_replace_file_content` edits.
 - **Parallel Dispatch:** When subtasks touch independent packages or files, invoke subagents concurrently in a single turn rather than sequentially.
+
+## 5. Mandatory One-Line Response Feedback Trace (Continuous Configuration Proof)
+To enable instant verification of active Antigravity rules, skills, and agents across all prompts and projects (and rapidly detect setup misconfigurations with minimal token overhead):
+- **Every assistant response (primary orchestrator and subagents) MUST start on line 1 with a single-line trace badge:**
+  `> 🧭 [rules: <active_rules> | skill: <active_skill|none> | agent: <role>]`
+- **Field Definitions (Traced back to repository contents):**
+  - `rules:` Comma-separated names of active rules from `.agents/rules/` (typically `agent-orchestration, sdlc-lifecycle-gates`).
+  - `skill:` Exact name of active skill/workflow from `.agents/skills/` or `.agents/workflows/` (e.g., `feature-lifecycle`, `bugfix-lifecycle`, `typescript-pro`, `predeploy-gate`), or `none` if answering standard prompts without specialized skills.
+  - `agent:` Active persona from `.agents/agents/` (e.g., `orchestrator`, `architect`, `engineer`, `tester`, `analyst`, `designer`).
+- **Misconfiguration Signals:**
+  - Missing top-line badge $\rightarrow$ Antigravity global rules not loaded or symlinks broken.
+  - `skill: none` during a workflow task $\rightarrow$ Workflow/skill was not triggered or recognized.
+  - Unexpected `agent:` value $\rightarrow$ Subagent delegation or role routing failure.

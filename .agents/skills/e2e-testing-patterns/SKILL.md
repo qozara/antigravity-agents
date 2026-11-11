@@ -5,6 +5,8 @@ description: End-to-end (E2E) and integration testing patterns using Jest, Playw
 
 # End-to-End (E2E) & Integration Testing Patterns
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: e2e-testing-patterns`.
+
 ## Guidelines
 1. **Realistic User Flows:** Test end-to-end critical paths (login $\rightarrow$ action $\rightarrow$ confirmation) using stable page object patterns and data attributes (`data-testid`).
 2. **Deterministic Isolation:** Ensure tests run against isolated state/databases with automatic teardown and seeding.

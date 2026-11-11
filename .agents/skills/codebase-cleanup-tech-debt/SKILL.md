@@ -5,6 +5,8 @@ description: Tech debt reduction, dead code elimination, architectural refactori
 
 # Codebase Cleanup & Tech Debt Reduction
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: codebase-cleanup-tech-debt`.
+
 ## Strategies
 1. **Dead Code Elimination:** Remove unused variables, deprecated files, dead exports, and orphaned dependencies.
 2. **Complexity Reduction:** Break down monolithic functions with high cyclomatic complexity into pure helper functions.

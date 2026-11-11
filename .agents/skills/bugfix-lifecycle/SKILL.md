@@ -7,6 +7,11 @@ description: End-to-end single-conversation bug-fix workflow enforcing root-caus
 
 Diagnose, reproduce, and resolve defects from a single conversation using strict test-first reproduction and deterministic verification gates.
 
+> **Autonomous Execution Mandate:** The user only needs to provide the defect description or stack trace (e.g., `/bugfix-lifecycle <defect>` or *"Fix <defect>"*). You MUST automatically execute branch setup, root-cause isolation, failing reproduction test creation via `@tester`/`@engineer` (`invoke_subagent`), surgical fix implementation, and `/predeploy-gate` verification (`verify-gates.sh`) without requiring the user to mention those steps in their prompt.
+>
+> **Feedback Trace Invariant:** Every response during bug-fix execution must start on line 1 with:
+> `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: bugfix-lifecycle | agent: <role>]`
+
 ## Phase 1: Triage, Root-Cause Diagnosis & Branch Setup
 1. **Branch Check:** Create or switch to `fix/<issue-or-bug-name>` from `main`.
 2. **Root-Cause Isolation:**

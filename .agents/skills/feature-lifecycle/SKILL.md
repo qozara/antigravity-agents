@@ -7,6 +7,11 @@ description: End-to-end single-conversation feature delivery workflow with propo
 
 Run the complete feature software development lifecycle from a single conversation while delegating isolated work to subagents and enforcing deterministic quality gates.
 
+> **Autonomous Execution Mandate:** The user only needs to provide the feature goal (e.g., `/feature-lifecycle <goal>` or *"Implement <goal>"*). You MUST automatically execute branch setup, planning (`implementation_plan.md`), `@tester` / `@engineer` delegation (`invoke_subagent`), `/predeploy-gate` verification (`verify-gates.sh`), and docs/i18n updates without requiring the user to mention those steps in their prompt.
+>
+> **Feedback Trace Invariant:** Every response during feature delivery must start on line 1 with:
+> `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: feature-lifecycle | agent: <role>]`
+
 ## Decision Tree: Proportional Stage Selection
 Before spawning subagents, classify the feature complexity to avoid unnecessary token overhead:
 - **Tier A — UI / Multi-Component / Schema Feature:** Run all phases (UX/Scope check $\rightarrow$ Architecture & ADR $\rightarrow$ QA Spec & TDD $\rightarrow$ Deterministic Gates).

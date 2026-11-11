@@ -5,6 +5,8 @@ description: Advanced TypeScript engineering patterns, strict typing, generics, 
 
 # Advanced TypeScript Engineering (TypeScript Pro)
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: typescript-pro`.
+
 ## Core Directives
 1. **Strict Type Safety:** Avoid `any` and `unknown` casts unless accompanied by runtime type guards or zod/valibot schemas.
 2. **Generics & Constraints:** Constrain generics (`<T extends Record<string, unknown>>`) rather than using loose open types.

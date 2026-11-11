@@ -5,6 +5,8 @@ description: Test-Driven Development (TDD) execution cycle (Red, Green, Refactor
 
 # Test-Driven Development (TDD) Cycle
 
+> **Feedback Trace Invariant:** When active, ensure line 1 trace badge reflects `skill: tdd-workflows-tdd-cycle`.
+
 ## The Three Phases
 1. **Red (Write Failing Tests First):**
    - Ingest requirements or QA Unit Test Specifications table.
