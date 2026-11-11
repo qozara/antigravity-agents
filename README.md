@@ -48,6 +48,8 @@ antigravity-agents/
 │   │   ├── feature-lifecycle/SKILL.md   # /feature-lifecycle — Single-conversation Feature SDLC
 │   │   ├── refactor-lifecycle/SKILL.md  # /refactor-lifecycle — Single-conversation Refactoring SDLC
 │   │   ├── bugfix-lifecycle/SKILL.md    # /bugfix-lifecycle — Single-conversation Bug-Fix SDLC
+│   │   ├── direct/SKILL.md              # /direct — Surgical/minimal execution (bypasses SDLC ceremony)
+│   │   ├── analyze/SKILL.md             # /analyze — Strict read-only investigation & proposal mode
 │   │   ├── predeploy-gate/              # /predeploy-gate — Deterministic Gate Runner + Script
 │   │   │   ├── SKILL.md
 │   │   │   └── scripts/verify-gates.sh  # Auto-detects typecheck, lint, test, npm audit, build
@@ -64,7 +66,9 @@ antigravity-agents/
 │   ├── workflows/                       # Backward-Compatible Workflow Wrappers
 │   │   ├── feature-lifecycle.md
 │   │   ├── refactor-lifecycle.md
-│   │   └── bugfix-lifecycle.md
+│   │   ├── bugfix-lifecycle.md
+│   │   ├── direct.md
+│   │   └── analyze.md
 │   ├── scripts/                         # Deterministic Hook Scripts
 │   │   ├── pre-tool-guard.sh            # Antigravity PreToolUse hook blocking main pushes & running gates
 │   │   └── git-pre-push.sh              # Git .git/hooks/pre-push deterministic gate wrapper
@@ -117,6 +121,14 @@ Because global rules (`sdlc-lifecycle-gates.md` and `agent-orchestration.md`) ar
   > `/bugfix-lifecycle Fix crash when submitting an empty filter form`
   > *(or simply: `Fix crash when submitting an empty filter form`)*
 
+- **Direct / Surgical Mode** *(bypasses plans, unsolicited subagents, and `/predeploy-gate`—executes only the literal instructions and any explicitly mentioned `@agent`/skill)*:
+  > `/direct Format the markdown tables in docs/API.md`
+  > *(or simply: `Reformat the markdown tables in docs/API.md`)*
+
+- **Read-Only Analysis & Proposal Mode** *(strictly forbidden from editing files or switching branches—investigates, explains behavior, or proposes a plan/diff in chat)*:
+  > `/analyze Investigate why offline sync retries twice on reconnect and propose a fix`
+  > *(or simply: `Explain why offline sync retries twice on reconnect without changing any code`)*
+
 ---
 
 ## 🧭 Continuous Configuration Proof: Response Feedback Trace
@@ -132,6 +144,8 @@ To instantly detect Antigravity setup misconfigurations (such as unlinked rules,
 | Prompt Scenario | Line 1 Feedback Trace Badge | Repo Reference |
 | :--- | :--- | :--- |
 | **Standard Prompt / Q&A** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: none \| agent: orchestrator]` | `.agents/rules/` |
+| **Read-Only Analysis (`/analyze`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: analyze \| agent: orchestrator]` | `.agents/skills/analyze/` |
+| **Direct Surgical Edit (`/direct`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: direct \| agent: orchestrator]` | `.agents/skills/direct/` |
 | **Feature Delivery (`/feature-lifecycle`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: feature-lifecycle \| agent: orchestrator]` | `.agents/skills/feature-lifecycle/` |
 | **Refactoring (`/refactor-lifecycle`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: refactor-lifecycle \| agent: orchestrator]` | `.agents/skills/refactor-lifecycle/` |
 | **Bug Fix (`/bugfix-lifecycle`)** | `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates \| skill: bugfix-lifecycle \| agent: orchestrator]` | `.agents/skills/bugfix-lifecycle/` |

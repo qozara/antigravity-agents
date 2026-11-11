@@ -5,7 +5,11 @@ description: "Non-negotiable verification gates, phase progression, and integrit
 
 # Mandatory SDLC Delivery Lifecycle & Quality Gates
 
-Every feature implementation, architectural refactoring, or bug fix MUST autonomously follow this 4-phase progression—even when the user only provides a short goal description (with or without a `/feature-lifecycle`, `/refactor-lifecycle`, or `/bugfix-lifecycle` prefix). Never wait for the user to explicitly mention planning, branch creation, `@tester`/`@engineer` delegation, or `/predeploy-gate` in their prompt. Do not advance to the next phase until the current phase's exit criteria are satisfied.
+Every non-trivial feature implementation, architectural refactoring, or bug fix MUST autonomously follow this 4-phase progression—even when the user only provides a short goal description (with or without a `/feature-lifecycle`, `/refactor-lifecycle`, or `/bugfix-lifecycle` prefix). Never wait for the user to explicitly mention planning, branch creation, `@tester`/`@engineer` delegation, or `/predeploy-gate` in their prompt. Do not advance to the next phase until the current phase's exit criteria are satisfied.
+
+> **Fine-Grained Bypass Exceptions (per `agent-orchestration.md`):**
+> - **Read-Only Analysis (`/analyze` or implicit questions/investigations):** Skip all 4 phases; strictly perform zero file edits or mutating commands.
+> - **Direct Execution (`/direct` or trivial formatting/copy micro-edits):** Skip `implementation_plan.md`, unsolicited subagents, and `/predeploy-gate`, executing only the literal instructions in the prompt while still enforcing Phase 4 Strict Integrity Rules.
 
 ## Phase 1: Planning, Blast Radius & Architecture
 - **Branch Hygiene:** Verify current Git branch first. Never commit or push directly to `main` or `master`; create or switch to a dedicated branch (`feature/<name>`, `refactor/<name>`, or `fix/<name>`).
