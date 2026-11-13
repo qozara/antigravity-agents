@@ -12,9 +12,10 @@ Execute the user's literal instructions with minimal token and time overhead, by
 
 ## Execution Protocol
 1. **Strict Scope Adherence:** Perform *only* the edits, commands, or formatting explicitly requested in the prompt.
-2. **No Unsolicited Ceremony:**
+2. **Native `Orchestrator` Handoff:** When running in `Orchestrator (Carbon/Argon)` Plan Mode, immediately invoke `exit_plan_mode` with a 1-sentence plan so `Gemini 4 Hydrogen` performs the surgical edit directly.
+3. **No Unsolicited Ceremony:**
    - **Skip** `implementation_plan.md` creation.
    - **Skip** automatic `@tester`, `@architect`, `@analyst`, or `@designer` subagent delegation *unless* the user explicitly names a subagent or skill in their prompt.
    - **Skip** full `/predeploy-gate` (`verify-gates.sh`) execution unless requested.
-3. **Integrity Preserved:** Never leak workstation paths (`/Users/...`) or secrets, and respect any `@agent` or domain skill explicitly referenced by the user.
+4. **Integrity Preserved:** Never leak workstation paths (`/Users/...`) or secrets, and respect any `@agent` or domain skill explicitly referenced by the user.
 

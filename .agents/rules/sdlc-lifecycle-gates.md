@@ -14,14 +14,14 @@ Every non-trivial feature implementation, architectural refactoring, or bug fix 
 ## Phase 1: Planning, Blast Radius & Architecture
 - **Branch Hygiene:** Verify current Git branch first. Never commit or push directly to `main` or `master`; create or switch to a dedicated branch (`feature/<name>`, `refactor/<name>`, or `fix/<name>`).
 - **ADR & Architecture Check:** If `docs/adr/` exists, review relevant Architectural Decision Records for conflicts before designing changes.
-- **Implementation Plan:** For multi-file features or refactorings, produce or update the `implementation_plan.md` artifact enumerating affected files, interface contracts, blast radius, security implications (OWASP, input validation, auth scopes), and test targets.
+- **Execution Plan Handoff (`exit_plan_mode`):** Under native `Orchestrator`, formulate the execution plan inside `exit_plan_mode(plan)` enumerating affected files, interface contracts, blast radius, security implications (OWASP, input validation, auth scopes), verification commands, test targets, and `"Re-plan if:"` triggers. Only write persistent docs (`docs/adr/`, `README.md`) when architecture or public contracts change.
 
-## Phase 2: TDD Execution & Subagent Delegation
+## Phase 2: TDD Execution & Conditional Subagent Delegation
 - **Test-First Discipline (Red -> Green -> Refactor):**
   - **Features:** Write failing unit/integration tests covering happy paths, edge cases, and error states before implementing business logic.
   - **Bug Fixes:** Write a failing reproduction test that isolates the root cause before applying the fix.
   - **Refactorings:** Verify existing baseline tests pass before modifying structure, and preserve external behavior throughout.
-- **Subagent Delegation:** Delegate isolated boilerplate, test generation, and localized fixes to subagents rather than churning large diffs in the primary orchestrator context.
+- **Execution Routing (`Hydrogen` vs. Subagents):** Under `Orchestrator (Carbon/Argon)`, `Gemini 4 Hydrogen` executes sequential Red-Green-Refactor directly after `exit_plan_mode`. Dispatch `@tester` or `@engineer` subagents via `invoke_subagent` only when parallelizing independent packages/files, isolating bulky test suites, or when running on a standalone non-Orchestrator model.
 
 ## Phase 3: Deterministic Pre-Deploy Gates (MANDATORY)
 Before declaring any task complete, opening a PR, or pushing a branch, execute all applicable deterministic checks via terminal (or run `/predeploy-gate`):
@@ -38,3 +38,4 @@ Before declaring any task complete, opening a PR, or pushing a branch, execute a
   - Never delete, skip (`.skip`), or weaken assertions in existing tests to force a green build.
   - Never commit generated databases (`.sqlite`, `.ndjson`), `.env` secrets, or ephemeral `implementation_plan.md` files unless tracked by the repo.
   - Never leak absolute workstation paths (`/Users/...` or `file:///`) or personal PII into code, tests, ADRs, or documentation.
+  - Never output obsolete IDE tab-closing phrases (e.g., `"Review tabs closed"` or `"all tabs were closed"`) or call deprecated tab-closing skills (`workspace.closeAllReviewTabs()`, `editor.closeFile()`).
