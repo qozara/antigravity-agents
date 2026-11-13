@@ -14,6 +14,7 @@ Investigate code behavior, diagnose root causes, explain architecture, or propos
 1. **Strict Read-Only Lock (Zero Mutations):**
    - **NEVER** create, edit, or delete workspace files (`edit_file`, `write_file`, `replace_file_content` are forbidden).
    - **NEVER** switch Git branches, stage/commit files, or run mutating terminal commands.
+   - **NEVER** call `exit_plan_mode` when running under `Orchestrator (Carbon/Argon)`—stay in the read-only Planner turn and reply directly.
 2. **Deep Grounded Analysis:**
    - Use read-only tools (`grep_search`, `view_file` / `read_file`, `find_by_name`, `list_dir`, or the `research` subagent) to inspect the codebase and trace execution paths.
 3. **Actionable Output:**

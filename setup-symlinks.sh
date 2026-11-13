@@ -52,6 +52,10 @@ WORKFLOW_TARGETS=(
 SCRIPT_TARGETS=(
     "${HOME}/.gemini/config/scripts"
 )
+LEGACY_PRUNE_TARGETS=(
+    "${HOME}/.gemini/antigravity/subagents"
+    "${HOME}/.gemini/config/global_workflows"
+)
 
 ensure_executable() {
     chmod +x "${SOURCE_DIR}/skills/predeploy-gate/scripts/verify-gates.sh" 2>/dev/null || true
@@ -143,7 +147,13 @@ setup_global() {
         prune_stale_symlinks "$target_dir" "${SOURCE_DIR}/skills"
         for skill_dir in "${SOURCE_DIR}/skills"/*; do
             if [ -d "$skill_dir" ]; then
-                ln -sfn "$skill_dir" "${target_dir}/$(basename "$skill_dir")"
+                local skill_name dest_path
+                skill_name="$(basename "$skill_dir")"
+                dest_path="${target_dir}/${skill_name}"
+                if [ -d "$dest_path" ] && [ ! -L "$dest_path" ]; then
+                    rm -rf "$dest_path"
+                fi
+                ln -sfn "$skill_dir" "$dest_path"
             fi
         done
     done
@@ -208,7 +218,12 @@ setup_global() {
     done
     echo ""
 
-    # 6. Install Git pre-push hooks across workspace repositories
+    # 6. Prune legacy symlink locations pointing into this repo
+    for target_dir in "${LEGACY_PRUNE_TARGETS[@]}"; do
+        remove_repo_symlinks "$target_dir"
+    done
+
+    # 7. Install Git pre-push hooks across workspace repositories
     install_git_hooks
 
     echo "🎉 Global Antigravity configuration complete!"
@@ -217,7 +232,7 @@ setup_global() {
 clean_global() {
     echo "=== Cleaning Global Antigravity Symlinks ==="
     local target_dir
-    for target_dir in "${RULE_TARGETS[@]}" "${SKILL_TARGETS[@]}" "${AGENT_TARGETS[@]}" "${WORKFLOW_TARGETS[@]}" "${SCRIPT_TARGETS[@]}"; do
+    for target_dir in "${RULE_TARGETS[@]}" "${SKILL_TARGETS[@]}" "${AGENT_TARGETS[@]}" "${WORKFLOW_TARGETS[@]}" "${SCRIPT_TARGETS[@]}" "${LEGACY_PRUNE_TARGETS[@]}"; do
         remove_repo_symlinks "$target_dir"
     done
     if [ -L "${HOME}/.gemini/config/hooks.json" ] && [[ "$(readlink "${HOME}/.gemini/config/hooks.json" || true)" == "${SOURCE_DIR}"/* ]]; then

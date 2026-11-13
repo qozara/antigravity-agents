@@ -7,29 +7,29 @@ description: End-to-end single-conversation feature delivery workflow with propo
 
 Run the complete feature software development lifecycle from a single conversation while delegating isolated work to subagents and enforcing deterministic quality gates.
 
-> **Autonomous Execution Mandate:** The user only needs to provide the feature goal (e.g., `/feature-lifecycle <goal>` or *"Implement <goal>"*). You MUST automatically execute branch setup, planning (`implementation_plan.md`), `@tester` / `@engineer` delegation (`invoke_subagent`), `/predeploy-gate` verification (`verify-gates.sh`), and docs/i18n updates without requiring the user to mention those steps in their prompt.
+> **Autonomous Execution Mandate:** The user only needs to provide the feature goal (e.g., `/feature-lifecycle <goal>` or *"Implement <goal>"*). Under native `Orchestrator (Carbon/Argon)`, the Planner formulates the TDD & gate plan via `exit_plan_mode(plan)` and `Gemini 4 Hydrogen` executes branch setup, Red-Green-Refactor, `/predeploy-gate` verification (`verify-gates.sh`), and docs/i18n updates directly—spawning `@tester`/`@engineer`/`@architect` subagents only for parallel streams or isolated complex specs.
 >
 > **Feedback Trace Invariant:** Every response during feature delivery must start on line 1 with:
 > `> 🧭 [rules: agent-orchestration, sdlc-lifecycle-gates | skill: feature-lifecycle | agent: <role>]`
 
 ## Decision Tree: Proportional Stage Selection
 Before spawning subagents, classify the feature complexity to avoid unnecessary token overhead:
-- **Tier A — UI / Multi-Component / Schema Feature:** Run all phases (UX/Scope check $\rightarrow$ Architecture & ADR $\rightarrow$ QA Spec & TDD $\rightarrow$ Deterministic Gates).
-- **Tier B — Standard Domain / API Feature:** Skip `@designer` and `@analyst`; go directly from Phase 1 (`@architect` or inline `/plan`) to Phase 2 (`@tester` + `@engineer` TDD) and Phase 3 (`/predeploy-gate`).
+- **Tier A — UI / Multi-Component / Schema Feature:** Include UX/Scope/Architecture review (`@designer`/`@analyst`/`@architect` if ambiguous or multi-package) $\rightarrow$ `exit_plan_mode(plan)` $\rightarrow$ TDD (`Hydrogen` or parallel `@tester`/`@engineer`) $\rightarrow$ Deterministic Gates.
+- **Tier B — Standard Domain / API Feature:** Formulate plan in Planner turn $\rightarrow$ `exit_plan_mode(plan)` $\rightarrow$ `Gemini 4 Hydrogen` executes Red-Green-Refactor + `/predeploy-gate` inline (use subagents only for parallel file sets).
 
-## Phase 1: Branch Setup, Discovery & Architecture (`/plan`)
-1. **Branch Check:** Ensure you are on `feature/<short-name>` (branching from updated `main`).
-2. **ADR & Codebase Scan:** Use `research` subagent or `grep_search` to inspect affected packages and `docs/adr/` for architectural constraints.
-3. **Optional UI / Scope Elicitation (Tier A only):**
+## Phase 1: Discovery, Architecture & Plan Handoff (`/plan`)
+1. **ADR & Codebase Scan:** Use `grep_search`, `read_file`, or `research` subagent to inspect affected packages and `docs/adr/` for architectural constraints.
+2. **Optional UI / Scope Elicitation (Tier A only):**
    - If user flows or WCAG 2.2 states are ambiguous, delegate wireframe/flow specs to `@designer` or scope/NFR definition to `@analyst`.
-4. **Architecture & Implementation Plan:**
-   - Produce or update `implementation_plan.md` enumerating affected files, data/schema contracts, security controls (OWASP, input validation, auth scopes), and test targets.
+3. **Architecture & Execution Plan (`exit_plan_mode`):**
+   - Formulate the execution plan inside `exit_plan_mode(plan)` enumerating `feature/<short-name>` branch setup, affected files, data/schema contracts, security controls (OWASP, input validation, auth scopes), verification commands, test targets, and `"Re-plan if:"` triggers (avoid creating an ephemeral `implementation_plan.md` on disk unless explicitly requested).
 
-## Phase 2: Shift-Left QA & TDD Implementation (Subagent Delegation)
-1. **Test Specification & Breaker Analysis:**
-   - Delegate to `@tester` (or formulate inline for small features) a concise **Unit Test Specification Table** (happy path, boundary conditions, null/error states, security checks) plus integration/E2E test stubs.
-2. **Red $\rightarrow$ Green $\rightarrow$ Refactor (`@engineer`):**
-   - Delegate implementation to `@engineer` (Flash tier) with explicit file boundaries:
+## Phase 2: Shift-Left QA & TDD Implementation (`Hydrogen` or Parallel Subagents)
+1. **Branch Check:** Ensure you are on `feature/<short-name>` (branching from updated `main`).
+2. **Test Specification & Breaker Analysis:**
+   - Formulate a concise **Unit Test Specification Table** (happy path, boundary conditions, null/error states, security checks) inline in the plan (or delegate to `@tester` for large multi-module breaker suites).
+3. **Red $\rightarrow$ Green $\rightarrow$ Refactor:**
+   - Execute inline on `Gemini 4 Hydrogen` (or dispatch parallel `@engineer` subagents for independent packages with explicit non-overlapping file boundaries):
      - **Red:** Write failing unit/integration tests matching the specification first.
      - **Green:** Implement minimal, clean domain and presentation code to pass tests.
      - **Refactor:** Apply `typescript-pro` and `vercel-react-best-practices` (if React) while keeping all tests green.
